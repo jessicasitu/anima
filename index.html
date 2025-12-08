@@ -603,8 +603,24 @@
       <p class="footer-cite">Framework: Kim et al. (2025) "Reflective Agency Framework for AI-Mediated Self-Reflection Systems"</p>
     </footer>
   </div>
-
   <script>
+
+    const postSurveyBase = "https://mit.co1.qualtrics.com/jfe/form/SV_0JuC9TggUE1uHnU";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const prolificPid = urlParams.get("PROLIFIC_PID");
+
+    const completeBtn = document.getElementById("completeBtn");
+
+    if (completeBtn) {
+    if (prolificPid) {
+        completeBtn.href = `${postSurveyBase}?PROLIFIC_PID=${encodeURIComponent(prolificPid)}`;
+    } else {
+        completeBtn.href = postSurveyBase;
+    }
+    }
+
+
     // ============================================
     // CYCLE PHASE CONTEXT
     // ============================================
