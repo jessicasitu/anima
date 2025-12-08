@@ -3,7 +3,20 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { systemPrompt, userPrompt } = req.body || {};
+  let body = {};
+  try {
+    if (typeof req.body === 'string') {
+      body = JSON.parse(req.body || '{}');
+    } else if (req.body) {
+      body = req.body;
+    }
+  } catch (e) {
+    console.error('Invalid JSON body:', e);
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+
+  const { systemPrompt, userPrompt } = body;
+
   if (!systemPrompt || !userPrompt) {
     return res.status(400).json({ error: 'Missing prompts' });
   }
