@@ -1,11 +1,9 @@
-// api/anthropic.js (Node serverless function for Vercel)
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { systemPrompt, userPrompt } = req.body || {};
-
   if (!systemPrompt || !userPrompt) {
     return res.status(400).json({ error: 'Missing prompts' });
   }
@@ -27,7 +25,7 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      console.error('Anthropic error', await response.text());
+      console.error('Anthropic error:', await response.text());
       return res.status(500).json({ error: 'Anthropic request failed' });
     }
 
