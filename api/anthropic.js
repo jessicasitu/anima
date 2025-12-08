@@ -1,17 +1,12 @@
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  return res.status(200).json({
-    reply: 'This is a test reflection coming from your /api/anthropic backend, not the templates.'
-  });
-}
-
-//export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.status(500).json({
+      error: 'Server is missing ANTHROPIC_API_KEY env var'
+    });
   }
 
   let body = {};
@@ -23,7 +18,7 @@ export default async function handler(req, res) {
     }
   } catch (e) {
     console.error('Invalid JSON body:', e);
-    return res.status(400).json({ error: 'Invalid JSON' });
+    return res.status(400).json({ error: 'Invalid JSON in request body' });
   }
 
   const { systemPrompt, userPrompt } = body;
@@ -33,7 +28,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const upstream = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -48,17 +43,36 @@ export default async function handler(req, res) {
       })
     });
 
-    if (!response.ok) {
-      console.error('Anthropic error:', await response.text());
-      return res.status(500).json({ error: 'Anthropic request failed' });
+    const text = await upstream.text(); // read body once
+
+    if (!upstream.ok) {
+      console.error('Anthropic error:', upstream.status, text);
+      return res.status(upstream.status).json({
+        error: 'Anthropic request failed',
+        status: upstream.status,
+        detail: text
+      });
     }
 
-    const data = await response.json();
-    const replyText = data.content?.[0]?.text || '';
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error('Failed to parse Anthropic JSON:', e, text);
+      return res.status(500).json({
+        error: 'Could not parse Anthropic response',
+        detail: text
+      });
+    }
+
+    const replyText = data?.content?.[0]?.text || '';
 
     return res.status(200).json({ reply: replyText });
   } catch (err) {
-    console.error('Server error:', err);
-    return res.status(500).json({ error: 'Server error' });
+    console.error('Server error calling Anthropic:', err);
+    return res.status(500).json({
+      error: 'Server error',
+      detail: String(err)
+    });
   }
-//}
+}
