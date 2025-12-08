@@ -728,6 +728,9 @@
     // ============================================
 // TRUE AI REFLECTION (Claude API) – IMPROVED
 // ============================================
+// ============================================
+// TRUE AI REFLECTION (Claude API) – ESTROGEN LANGUAGE
+// ============================================
 async function generateAIReflection(context) {
   const { features, selfReport, cyclePhase } = context;
   const cycleContext = CYCLE_CONTEXTS[cyclePhase];
@@ -742,7 +745,6 @@ async function generateAIReflection(context) {
   // Build a short journal snippet (for quoting)
   let journalSnippet = '';
   if (selfReport.journal && selfReport.journal.length > 0) {
-    // Take first ~20 words as a snippet
     const words = selfReport.journal.split(/\s+/).slice(0, 20);
     journalSnippet = words.join(' ');
     if (selfReport.journal.split(/\s+/).length > 20) {
@@ -757,7 +759,8 @@ async function generateAIReflection(context) {
     sessionHistory =
       `Most recent prior reflection in THIS SESSION:\n` +
       `- Time: ${last.time}\n` +
-      `- E2: ${last.e2} pg/mL, Phase: ${last.phase}\n` +
+      `- Estrogen-like value: ${last.e2} pg/mL (simulated)\n` +
+      `- Cycle phase: ${last.phase}\n` +
       `- Moods: ${last.moods || 'none recorded'}\n` +
       `- Energy: ${last.energy}, Sensitivity: ${last.sensitivity}\n` +
       `- Reflection text (excerpt): "${(last.text || '').slice(0, 200)}${last.text && last.text.length > 200 ? '…' : ''}"\n` +
@@ -781,10 +784,19 @@ YOUR CORE PRINCIPLES:
    - Never say what something "is" definitively.
    - Use language like "might", "could", "sometimes", "may".
 4. TRANSPARENCY OF MEDIATION (TM)
-   - Make it clear you are responding to their E2 reading, trend, phase, moods, sliders, and (if present) their journal.
+   - Make it clear you are responding to their hormone reading, trend, phase, moods, sliders, and (if present) their journal.
 5. SELF-CONTINUITY (SC)
    - They are never "just hormones".
    - Acknowledge them as a whole person with history, context, and agency.
+
+LANGUAGE RULES:
+- Use everyday language: say "estrogen" or "hormone levels", NOT "E2" or "estradiol".
+- If you mention a menstrual phase, briefly gloss it in plain words, e.g.:
+  • "menstrual phase (on your period)"
+  • "follicular phase (right after your period)"
+  • "ovulatory phase (around mid-cycle)"
+  • "luteal phase (the days before your period)"
+- Avoid medical jargon and clinical phrasing.
 
 STRICT BOUNDARIES:
 - NEVER diagnose any condition.
@@ -797,7 +809,8 @@ WHAT YOU ALWAYS DO:
 - Reference at least ONE specific thing from their inputs:
   • a mood word they chose,
   • OR the energy/sensitivity description,
-  • OR a short quote from their journal (if present).
+  • OR a short quote from their journal (if present),
+  • OR the way their hormone level is moving (higher, lower, or steady).
 - If a journal note is provided, briefly quote a short fragment (3–12 words) in quotes, e.g. "you wrote 'I feel…'".
 - Keep the reflection SHORT: 3–5 sentences max.
 - End with ONE soft, open question they can take or leave.
@@ -806,7 +819,7 @@ WHAT YOU ALWAYS DO:
 SESSION HISTORY & CONTINUITY:
 - You may use the SESSION HISTORY (if present) to gently connect this moment to earlier reflections in THIS SESSION only.
 - If you reference it, be specific but light, e.g. "Earlier in this session you described…" or "Compared to what you named before…".
-- You may also *briefly* mention that this reflection is being saved in their session log so later reflections in this session can gently notice patterns (like repeated moods or shifts in how they describe their body).
+- You may also *briefly* mention that this reflection is being saved in their session log for this session, so later reflections today can gently notice patterns (like repeated moods or shifts in how they describe their body).
 - Do NOT imply long-term storage beyond the current session, and do NOT say anything about future days, weeks, or medical tracking.
 
 TONE:
@@ -814,17 +827,17 @@ TONE:
 - Curiosity over judgment.
 - Acceptance over fixing.
 
-CYCLE CONTEXT:
+CYCLE CONTEXT (for your understanding only, not verbatim quoting):
 ${cycleContext.aiContext}
 `;
 
   const userPrompt = `Here is the user's CURRENT DATA for this reflection:
 
-E2 DATA (CURRENT MOMENT)
-- Current E2: ${features.value.toFixed(0)} pg/mL
-- Category: ${features.category}
-- Trend: ${features.trend} (${features.delta10m > 0 ? '+' : ''}${features.delta10m.toFixed(0)} over ~10 minutes)
-- Cycle Phase: ${cyclePhase}
+HORMONE DATA (CURRENT MOMENT)
+- Current estrogen-like value: ${features.value.toFixed(0)} (pg/mL, simulated)
+- Interpreted range label: ${features.category}
+- Trend over the last ~10 minutes: ${features.trend} (${features.delta10m > 0 ? '+' : ''}${features.delta10m.toFixed(0)})
+- Cycle phase label: ${cyclePhase}
 
 SELF-REPORT (CURRENT MOMENT)
 - Selected moods: ${moodsText}
@@ -837,11 +850,13 @@ ${sessionHistory}
 
 YOUR TASK:
 Using ONLY the information above, write a short, gentle reflection (3–5 sentences) that:
-1. Explicitly ties at least one part of the reflection to THEIR concrete data (a mood word, slider description, E2 details, or a quoted journal phrase).
-2. Acknowledges their current state in relation to their E2 rhythm and cycle phase WITHOUT claiming causation.
-3. Optionally, if it feels natural AND session history is present, lightly connect this reflection to what they named earlier in this session.
-4. Optionally, in just one short sentence, you may mention that ANIMA is saving this reflection in their session log for this session, so later reflections today can gently notice patterns (e.g., repeated moods or shifts in how they describe their body).
-5. Ends with ONE soft, open question that invites reflection (not action), such as "What might your body be asking for right now?" or similar.
+1. Explicitly ties at least one part of the reflection to THEIR concrete data (a mood word, slider description, hormone movement, or a quoted journal phrase).
+2. Talks about "estrogen" or "hormone levels" in plain language, NOT "E2" or "estradiol".
+3. If you mention the menstrual phase, include a short explanatory phrase in parentheses (e.g. "the days before your period").
+4. Acknowledges their current state in relation to their hormone rhythm and cycle phase WITHOUT claiming causation.
+5. Optionally, if it feels natural AND session history is present, lightly connect this reflection to what they named earlier in this session.
+6. Optionally, in just one short sentence, you may mention that ANIMA is saving this reflection in their session log for this session, so later reflections today can gently notice patterns.
+7. Ends with ONE soft, open question that invites reflection (not action), such as "What might your body be asking for right now?" or similar.
 
 Respond with ONLY the reflection text (no headings, no lists, no meta commentary).`;
 
@@ -867,7 +882,6 @@ Respond with ONLY the reflection text (no headings, no lists, no meta commentary
     return null;
   }
 }
-
     // ============================================
     // FALLBACK: RAF-ALIGNED TEMPLATE GENERATION
     // ============================================
