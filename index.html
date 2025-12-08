@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANIMA - AI Reflective Companion</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      /* Light mode base: white - light gray */
+      --bg-primary: #f5f5f5;
+      --bg-secondary: #ebebeb;
+      --bg-card: rgba(255,255,255,0.7);
+      --bg-input: rgba(0,0,0,0.03);
+      
+      /* Text: black for bold, dark gray for regular */
+      --text-primary: #1a1a1a;
+      --text-bold: #000000;
+      --text-secondary: #4a4a4a;
+      --text-muted: #888888;
+      
+      /* Lavender accent for selections */
+      --accent: rgba(140,120,180,0.95);
+      --accent-soft: rgba(140,120,180,0.7);
+      --accent-bg: rgba(160,140,200,0.15);
+      --accent-border: rgba(140,120,180,0.4);
+      
+      /* Borders: subtle grays */
+      --border: rgba(0,0,0,0.08);
+      --border-hover: rgba(0,0,0,0.15);
+      
+      /* Chart color: muted lavender-gray */
+      --chart-line: rgba(120,100,160,0.6);
+      --chart-baseline: rgba(0,0,0,0.1);
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(160deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    .container { max-width: 540px; margin: 0 auto; padding: 20px; }
+    
+    /* Header */
+    .header { text-align: center; padding: 40px 0 30px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+    .logo { font-size: 2.8rem; font-weight: 300; letter-spacing: 0.35em; color: var(--text-bold); margin-bottom: 8px; }
+    .subtitle { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; }
+    .research-badge {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
+      padding: 6px 14px; background: rgba(0,0,0,0.04); border: 1px solid var(--border);
+      border-radius: 20px; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--text-secondary); font-weight: 500;
+    }
+    .badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    
+    /* Sections */
+    .section { margin-bottom: 28px; padding: 20px; background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-bold); }
+    .section-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
+    
+    /* Cycle Phase Selector - 2x2 grid */
+    .cycle-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+    .cycle-option {
+      padding: 14px 10px; background: rgba(255,255,255,0.6); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text-secondary); cursor: pointer;
+      transition: all 0.2s; text-align: center;
+    }
+    .cycle-option:hover { background: rgba(255,255,255,0.9); border-color: var(--border-hover); }
+    .cycle-option.selected { 
+      background: var(--accent-bg); 
+      border-color: var(--accent-border); 
+      color: var(--accent); 
+    }
+    .cycle-option .phase-name { font-weight: 700; font-size: 0.9rem; display: block; margin-bottom: 4px; color: var(--text-bold); }
+    .cycle-option.selected .phase-name { color: var(--accent); }
+    .cycle-option .phase-simple { font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px; font-style: italic; }
+    .cycle-option.selected .phase-simple { color: var(--accent-soft); }
+    .cycle-option .phase-e2 { font-size: 0.68rem; color: var(--text-muted); display: block; }
+    .cycle-option.selected .phase-e2 { color: var(--accent-soft); }
+    
+    /* E2 Context Box */
+    .e2-context {
+      margin-top: 16px; padding: 14px; background: var(--bg-input); border-radius: 10px;
+      font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+    }
+    .e2-context strong { color: var(--text-bold); font-weight: 700; }
+    
+    /* E2 Panel */
+    .e2-panel { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .e2-metric { text-align: center; }
+    .e2-metric-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
+    .e2-metric-value { font-size: 1.6rem; font-weight: 300; color: var(--text-bold); }
+    .e2-metric-unit { font-size: 0.7rem; color: var(--text-muted); }
+    
+    /* E2 Category badges - neutral grays */
+    .e2-category { 
+      display: inline-block; padding: 3px 10px; 
+      background: rgba(0,0,0,0.05); 
+      border-radius: 12px; font-size: 0.75rem; 
+      color: var(--text-secondary); font-weight: 500;
+    }
+    .e2-category.low { background: rgba(100,120,150,0.12); color: rgba(70,90,120,0.9); }
+    .e2-category.normal { background: rgba(100,100,100,0.1); color: var(--text-secondary); }
+    .e2-category.high { background: rgba(150,120,80,0.12); color: rgba(120,90,50,0.9); }
+    .e2-category.very-high { background: rgba(150,100,100,0.12); color: rgba(130,70,70,0.9); }
+    
+    /* Chart */
+    .chart-container { width: 100%; height: 100px; margin-top: 16px; border-radius: 8px; overflow: hidden; }
+    #e2Chart { width: 100%; height: 100%; }
+    
+    /* Sliders */
+    .slider-group { margin-bottom: 18px; }
+    .slider-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .slider-label { font-size: 0.85rem; color: var(--text-bold); font-weight: 600; }
+    .slider-range { font-size: 0.7rem; color: var(--text-muted); }
+    input[type="range"] { 
+      width: 100%; height: 4px; -webkit-appearance: none; 
+      background: rgba(0,0,0,0.1); border-radius: 2px; outline: none; 
+    }
+    input[type="range"]::-webkit-slider-thumb { 
+      -webkit-appearance: none; width: 18px; height: 18px; 
+      background: var(--text-secondary); border-radius: 50%; cursor: pointer;
+      transition: background 0.2s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--accent);
+    }
+    
+    /* Mood chips */
+    .chip-label { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; }
+    .mood-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .mood-chip { 
+      padding: 6px 12px; background: rgba(255,255,255,0.7); 
+      border: 1px solid var(--border); border-radius: 16px; 
+      font-size: 0.75rem; color: var(--text-secondary); 
+      cursor: pointer; transition: all 0.2s; font-weight: 500;
+    }
+    .mood-chip:hover { background: rgba(255,255,255,0.95); border-color: var(--border-hover); }
+    .mood-chip.selected { 
+      background: var(--accent-bg); 
+      border-color: var(--accent-border); 
+      color: var(--accent); 
+      font-weight: 600;
+    }
+    
+    /* Journal */
+    .journal-input { 
+      width: 100%; padding: 14px; background: rgba(255,255,255,0.8); 
+      border: 1px solid var(--border); border-radius: 10px; 
+      color: var(--text-primary); font-size: 0.9rem; font-family: inherit; 
+      resize: vertical; min-height: 90px; 
+    }
+    .journal-input::placeholder { color: var(--text-muted); }
+    .journal-input:focus { outline: none; border-color: var(--accent-border); }
+    
+    /* Buttons */
+    .btn-group { display: flex; gap: 10px; margin-top: 16px; }
+    .btn-primary { 
+      flex: 1; padding: 14px 20px; 
+      background: var(--accent-bg); 
+      border: 1px solid var(--accent-border); 
+      border-radius: 10px; color: var(--accent); 
+      font-size: 0.9rem; font-family: inherit; cursor: pointer; 
+      transition: all 0.2s; font-weight: 600;
+    }
+    .btn-primary:hover:not(:disabled) { 
+      background: rgba(140,120,180,0.22); 
+      border-color: rgba(140,120,180,0.55); 
+    }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { 
+      padding: 14px 16px; background: rgba(255,255,255,0.6); 
+      border: 1px solid var(--border); border-radius: 10px; 
+      color: var(--text-muted); font-size: 0.8rem; font-family: inherit; 
+      cursor: pointer; transition: all 0.2s; font-weight: 500;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.9); border-color: var(--border-hover); }
+    
+    /* Mode Toggle */
+    .mode-toggle { margin-bottom: 12px; }
+    .mode-options { display: flex; gap: 10px; }
+    .mode-option {
+      flex: 1; padding: 12px 14px; 
+      background: rgba(255,255,255,0.6); 
+      border: 1px solid var(--border); border-radius: 10px;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      font-family: inherit; font-size: 0.85rem; color: var(--text-secondary);
+    }
+    .mode-option:hover { background: rgba(255,255,255,0.9); border-color: var(--border-hover); }
+    .mode-option.selected {
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
+      color: var(--accent);
+    }
+    .mode-option.selected .mode-desc { color: var(--accent-soft); }
+    .mode-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .ai-dot { background: var(--accent); }
+    .mode-option:not(.selected) .ai-dot { background: var(--text-muted); }
+    .offline-dot { background: var(--text-muted); }
+    .mode-option.selected .offline-dot { background: var(--accent); }
+    .mode-option.selected .ai-dot { animation: pulse 1.5s infinite; }
+    .mode-desc { font-size: 0.68rem; color: var(--text-muted); }
+    
+    /* RAF Link - subtle */
+    .raf-link {
+      background: none; border: none; 
+      color: var(--text-muted); font-size: 0.7rem; 
+      cursor: pointer; font-family: inherit;
+      padding: 4px 0; transition: color 0.2s;
+    }
+    .raf-link:hover { color: var(--accent); }
+    
+    /* Generate Button - full width */
+    .btn-generate {
+      width: 100%; padding: 14px 20px;
+      background: var(--accent-bg);
+      border: 1px solid var(--accent-border);
+      border-radius: 10px; color: var(--accent);
+      font-size: 0.9rem; font-family: inherit; cursor: pointer;
+      transition: all 0.2s; font-weight: 600;
+    }
+    .btn-generate:hover:not(:disabled) {
+      background: rgba(140,120,180,0.22);
+      border-color: rgba(140,120,180,0.55);
+    }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    /* Reflection Limit Counter */
+    .reflection-limit {
+      text-align: center; margin-bottom: 10px;
+      font-size: 0.75rem; color: var(--text-muted);
+    }
+    .reflection-limit.warning { color: #c97a00; }
+    .reflection-limit.depleted { color: #b55; }
+    
+    /* Complete Session Button */
+    .complete-session {
+      margin-bottom: 20px; padding: 16px;
+      background: var(--accent-bg); border: 1px solid var(--accent-border);
+      border-radius: 10px; text-align: center;
+    }
+    .complete-message {
+      font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;
+    }
+    .complete-btn {
+      display: inline-block; padding: 12px 24px;
+      background: var(--accent); color: white;
+      border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .complete-btn:hover { background: rgba(140,120,180,1); transform: translateY(-1px); }
+    
+    /* Reflection card */
+    .reflection-card { 
+      margin-top: 20px; padding: 20px; 
+      background: rgba(255,255,255,0.7); 
+      border: 1px solid var(--accent-border); 
+      border-radius: 12px; animation: fadeIn 0.4s ease; 
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .reflection-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .reflection-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+    .reflection-source { 
+      font-size: 0.65rem; padding: 3px 8px; 
+      background: rgba(0,0,0,0.05); 
+      border-radius: 4px; color: var(--text-muted); margin-left: 8px; font-weight: 500;
+    }
+    .reflection-source.ai { 
+      background: var(--accent-bg); 
+      color: var(--accent); 
+    }
+    .dismiss-btn { 
+      width: 24px; height: 24px; background: rgba(255,255,255,0.8); 
+      border: 1px solid var(--border); border-radius: 50%; 
+      color: var(--text-muted); cursor: pointer; font-size: 1rem; line-height: 1; 
+    }
+    .dismiss-btn:hover { border-color: var(--border-hover); color: var(--text-secondary); }
+    .reflection-text { font-size: 1rem; line-height: 1.75; color: var(--text-primary); margin-bottom: 16px; }
+    .reflection-meta { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 14px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+    .meta-tag { 
+      font-size: 0.68rem; color: var(--text-muted); 
+      background: rgba(0,0,0,0.04); 
+      padding: 3px 8px; border-radius: 4px; font-weight: 500;
+    }
+    .reflection-disclaimer { font-size: 0.75rem; color: var(--text-muted); font-style: italic; line-height: 1.5; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+    
+    /* Reflection Response Options */
+    .reflection-response { margin-top: 16px; }
+    .response-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    .response-btn {
+      padding: 8px 14px; background: rgba(255,255,255,0.6);
+      border: 1px solid var(--border); border-radius: 20px;
+      font-size: 0.75rem; font-family: inherit; color: var(--text-secondary);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .response-btn:hover { background: rgba(255,255,255,0.9); border-color: var(--border-hover); }
+    .response-btn.active, .response-btn.resonates.active {
+      background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent);
+    }
+    
+    /* Sit with this animation */
+    .reflection-card.sitting { animation: gentleFade 1.5s ease forwards; }
+    @keyframes gentleFade { 
+      0% { opacity: 1; transform: scale(1); } 
+      100% { opacity: 0; transform: scale(0.98); } 
+    }
+    
+    /* Add thoughts section */
+    .add-thoughts { margin-top: 12px; }
+    .add-thoughts-toggle {
+      background: none; border: none; padding: 6px 0;
+      font-size: 0.75rem; color: var(--text-muted); cursor: pointer;
+      font-family: inherit; transition: color 0.2s;
+    }
+    .add-thoughts-toggle:hover, .add-thoughts-toggle.active { color: var(--accent); }
+    .thoughts-input-container {
+      display: none; margin-top: 10px; 
+    }
+    .thoughts-input-container.visible { display: block; animation: fadeIn 0.3s ease; }
+    .thoughts-input {
+      width: 100%; padding: 12px; min-height: 70px;
+      background: rgba(255,255,255,0.8); border: 1px solid var(--border);
+      border-radius: 8px; font-size: 0.85rem; font-family: inherit;
+      color: var(--text-primary); resize: vertical;
+    }
+    .thoughts-input::placeholder { color: var(--text-muted); font-style: italic; }
+    .thoughts-input:focus { outline: none; border-color: var(--accent-border); }
+    .thoughts-save {
+      margin-top: 8px; padding: 8px 14px;
+      background: var(--accent-bg); border: 1px solid var(--accent-border);
+      border-radius: 6px; font-size: 0.75rem; font-family: inherit;
+      color: var(--accent); cursor: pointer; transition: all 0.2s;
+    }
+    .thoughts-save:hover { background: rgba(140,120,180,0.22); }
+    
+    /* Session History */
+    .session-history { margin-bottom: 16px; }
+    .view-session-toggle {
+      background: none; border: none; padding: 8px 0;
+      font-size: 0.8rem; color: var(--text-secondary); cursor: pointer;
+      font-family: inherit; transition: color 0.2s;
+    }
+    .view-session-toggle:hover { color: var(--accent); }
+    .session-count { color: var(--text-muted); font-size: 0.75rem; }
+    .session-panel {
+      display: none; margin-top: 12px; padding: 16px;
+      background: rgba(255,255,255,0.5); border: 1px solid var(--border);
+      border-radius: 10px; max-height: 400px; overflow-y: auto;
+    }
+    .session-panel.visible { display: block; animation: fadeIn 0.3s ease; }
+    .session-empty { color: var(--text-muted); font-size: 0.8rem; font-style: italic; text-align: center; }
+    .session-list { display: flex; flex-direction: column; gap: 12px; }
+    .session-item {
+      padding: 14px; background: rgba(255,255,255,0.7);
+      border: 1px solid var(--border); border-radius: 8px;
+    }
+    .session-item-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px; font-size: 0.7rem; color: var(--text-muted);
+    }
+    .session-item-source {
+      font-size: 0.65rem; padding: 2px 6px;
+      background: rgba(0,0,0,0.05); border-radius: 4px;
+    }
+    .session-item-source.ai { background: var(--accent-bg); color: var(--accent); }
+    .session-item-text { font-size: 0.85rem; line-height: 1.6; color: var(--text-primary); margin-bottom: 8px; }
+    .session-item-thoughts {
+      margin-top: 10px; padding: 10px; background: var(--accent-bg);
+      border-radius: 6px; font-size: 0.8rem; color: var(--text-secondary);
+    }
+    .session-item-thoughts-label { 
+      font-size: 0.68rem; color: var(--accent); 
+      text-transform: uppercase; letter-spacing: 0.05em; 
+      margin-bottom: 4px; font-weight: 600;
+    }
+    
+    /* RAF Panel */
+    .raf-panel { 
+      margin-top: 16px; padding: 18px; 
+      background: var(--bg-input); 
+      border-radius: 10px; font-size: 0.82rem; line-height: 1.6; display: none; 
+    }
+    .raf-panel.visible { display: block; animation: fadeIn 0.3s ease; }
+    .raf-panel h4 { color: var(--text-bold); margin-bottom: 10px; font-weight: 700; }
+    .raf-panel h4 { color: var(--text-bold); font-weight: 700; margin-bottom: 12px; font-size: 1rem; }
+    .raf-panel p { color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6; }
+    .raf-panel .raf-intro { font-size: 0.88rem; margin-bottom: 16px; }
+    .raf-panel .raf-intro em { color: var(--accent); font-style: italic; }
+    .raf-panel .raf-principle { margin-bottom: 14px; }
+    .raf-panel .raf-principle strong { color: var(--text-bold); font-weight: 700; display: block; margin-bottom: 4px; font-size: 0.85rem; }
+    .raf-panel .raf-principle p { font-size: 0.82rem; margin-bottom: 0; color: var(--text-secondary); }
+    .raf-panel .raf-principle em { color: var(--accent-soft); }
+    .raf-panel .raf-footer { 
+      margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); 
+      font-size: 0.82rem; color: var(--text-muted); 
+    }
+    .raf-panel .raf-footer strong { color: var(--accent); }
+    
+    /* Footer */
+    .footer { text-align: center; padding: 30px 20px; border-top: 1px solid var(--border); margin-top: 30px; }
+    .footer p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 8px; }
+    .footer-credit { color: var(--text-bold); }
+    .footer-credit strong { font-weight: 700; }
+    .footer-cite { font-size: 0.68rem; color: var(--text-muted); }
+    
+    /* Loading */
+    .loading { display: inline-flex; align-items: center; gap: 8px; }
+    .loading-dot { 
+      width: 6px; height: 6px; 
+      background: var(--accent); 
+      border-radius: 50%; animation: loadingPulse 1.2s infinite; 
+    }
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes loadingPulse { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="logo">ANIMA</h1>
+      <p class="subtitle">Estradiol-Aware Reflective Companion</p>
+      <div class="research-badge"><span class="badge-dot"></span>RESEARCH PROTOTYPE · NOT DIAGNOSTIC</div>
+    </header>
+
+    <!-- Cycle Phase Selector -->
+    <section class="section">
+      <h2 class="section-title">Cycle Context</h2>
+      <p class="section-desc">Select your approximate cycle phase. This helps ANIMA set realistic E2 baselines and provide contextually aware reflections.</p>
+      
+      <div class="cycle-options" id="cycleOptions">
+        <button class="cycle-option selected" data-phase="menstrual" data-baseline="40">
+          <span class="phase-name">Menstrual</span>
+          <span class="phase-simple">"I'm on my period"</span>
+          <span class="phase-e2">E2: ~20-60 pg/mL</span>
+        </button>
+        <button class="cycle-option" data-phase="follicular" data-baseline="80">
+          <span class="phase-name">Follicular</span>
+          <span class="phase-simple">"Period just ended"</span>
+          <span class="phase-e2">E2: ~30-150 pg/mL</span>
+        </button>
+        <button class="cycle-option" data-phase="ovulatory" data-baseline="250">
+          <span class="phase-name">Ovulatory</span>
+          <span class="phase-simple">"Mid-cycle"</span>
+          <span class="phase-e2">E2: ~100-400 pg/mL</span>
+        </button>
+        <button class="cycle-option" data-phase="luteal" data-baseline="130">
+          <span class="phase-name">Luteal</span>
+          <span class="phase-simple">"Before my next period"</span>
+          <span class="phase-e2">E2: ~50-250 pg/mL</span>
+        </button>
+      </div>
+      
+      <div class="e2-context" id="cycleContext">
+        <strong>Menstrual phase (days 1-5):</strong> Estradiol is typically at its lowest. Lower E2 can correlate with fatigue, lower mood, or a need for rest. This is physiologically normal.
+      </div>
+    </section>
+
+    <!-- E2 Sensing -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">E2 Sensing Layer (Simulated)</h2>
+        <button id="toggleSimulator" class="btn-secondary" style="padding: 6px 12px; font-size: 0.7rem;">Pause</button>
+      </div>
+      <p class="section-desc">The simulator generates estradiol-like patterns based on your selected cycle phase. In a full system, this would come from a wearable biosensor.</p>
+      
+      <div class="e2-panel">
+        <div class="e2-metric">
+          <div class="e2-metric-label">Current E2</div>
+          <div class="e2-metric-value" id="e2Value">--</div>
+          <div class="e2-metric-unit">pg/mL</div>
+        </div>
+        <div class="e2-metric">
+          <div class="e2-metric-label">Category</div>
+          <div id="e2Category" class="e2-category">--</div>
+        </div>
+        <div class="e2-metric">
+          <div class="e2-metric-label">Trend</div>
+          <div id="e2Trend" class="e2-category">--</div>
+        </div>
+      </div>
+      
+      <div class="chart-container"><canvas id="e2Chart"></canvas></div>
+    </section>
+
+    <!-- Mood & Self-Report -->
+    <section class="section">
+      <h2 class="section-title">Self-Report</h2>
+      <p class="section-desc">These inputs help ANIMA calibrate its reflection to your current state. All fields are optional.</p>
+      
+      <p class="chip-label">How are you feeling? Select all that apply:</p>
+      <div class="mood-chips" id="moodChips">
+        <button class="mood-chip" data-mood="excited">Excited</button>
+        <button class="mood-chip" data-mood="motivated">Motivated</button>
+        <button class="mood-chip" data-mood="calm">Calm</button>
+        <button class="mood-chip" data-mood="content">Content</button>
+        <button class="mood-chip" data-mood="peaceful">Peaceful</button>
+        <button class="mood-chip" data-mood="anxious">Anxious</button>
+        <button class="mood-chip" data-mood="irritable">Irritable</button>
+        <button class="mood-chip" data-mood="restless">Restless</button>
+        <button class="mood-chip" data-mood="disconnected">Disconnected</button>
+        <button class="mood-chip" data-mood="tired">Tired</button>
+        <button class="mood-chip" data-mood="withdrawn">Withdrawn</button>
+      </div>
+      
+      <div class="slider-group">
+        <div class="slider-header"><span class="slider-label">Energy</span><span class="slider-range">drained ↔ alive</span></div>
+        <input type="range" id="energySlider" min="1" max="5" value="3">
+      </div>
+      <div class="slider-group">
+        <div class="slider-header"><span class="slider-label">Sensitivity</span><span class="slider-range">tender ↔ resilient</span></div>
+        <input type="range" id="sensitivitySlider" min="1" max="5" value="3">
+      </div>
+      
+      <textarea id="journalInput" class="journal-input" placeholder="Optional: What's present for you right now? Write as much or as little as feels right..."></textarea>
+    </section>
+
+    <!-- AI Reflection -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">AI Reflection Layer</h2>
+        <button id="rafInfoBtn" class="raf-link">About RAF ›</button>
+      </div>
+      <p class="section-desc">ANIMA generates personalized reflections based on your E2 rhythm and self-report. All reflections follow the Reflective Agency Framework—no diagnoses, no prescriptions.</p>
+      
+      <div id="rafPanel" class="raf-panel">
+        <h4>Reflective Agency Framework (RAF)</h4>
+        <p class="raf-intro">ANIMA is built on the Reflective Agency Framework (Kim et al., 2025), designed to support self-understanding without undermining personal autonomy. The framework ensures AI-mediated reflection remains <em>yours</em>—not something imposed on you.</p>
+        
+        <div class="raf-principle">
+          <strong>1. Internal Origination</strong>
+          <p>Reflections only appear when <em>you</em> request them. ANIMA never pushes insights, notifications, or unsolicited advice. You remain the author of your own reflection process.</p>
+        </div>
+        
+        <div class="raf-principle">
+          <strong>2. Calibrated Responsiveness</strong>
+          <p>The AI adapts its tone and content to your current state—your E2 level, energy, sensitivity, and what you've shared. Low energy gets gentleness; high sensitivity gets care. The response meets you where you are.</p>
+        </div>
+        
+        <div class="raf-principle">
+          <strong>3. Reflective Ambiguity</strong>
+          <p>ANIMA offers possibilities, not conclusions. Language like "might," "could," and "sometimes" keeps interpretations open. The AI ends with questions, not answers—inviting your own meaning-making rather than providing diagnoses.</p>
+        </div>
+        
+        <div class="raf-principle">
+          <strong>4. Transparency of Mediation</strong>
+          <p>You always see what data informed the reflection—your E2 reading, trend, cycle phase, and self-report. Nothing is hidden. You understand <em>why</em> the AI responded as it did.</p>
+        </div>
+        
+        <div class="raf-principle">
+          <strong>5. Self-Continuity</strong>
+          <p>Reflections acknowledge your hormonal context without <em>reducing</em> you to it. You're a whole person with history, complexity, and agency—not just a data point. ANIMA supports your ongoing self-narrative.</p>
+        </div>
+        
+        <p class="raf-footer">The goal is <strong>self-understanding</strong>, not self-management. Reflection over fixing. Curiosity over judgment.</p>
+      </div>
+      
+      <div class="mode-toggle">
+        <div class="mode-options">
+          <button class="mode-option selected" data-mode="ai">
+            <span class="mode-dot ai-dot"></span>
+            <span>AI Mode</span>
+            <span class="mode-desc">Live Claude AI</span>
+          </button>
+          <button class="mode-option" data-mode="offline">
+            <span class="mode-dot offline-dot"></span>
+            <span>Offline Mode</span>
+            <span class="mode-desc">RAF Templates</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="reflection-limit">
+        <span id="reflectionCounter">5 reflections remaining</span>
+      </div>
+      
+      <button id="generateBtn" class="btn-generate">Generate Reflection</button>
+      
+      <div id="reflectionContainer"></div>
+    </section>
+
+    <footer class="footer">
+      <div class="complete-session">
+        <p class="complete-message">When you're ready, complete the post-survey to finish the study.</p>
+        <a id="completeBtn" href="YOUR_QUALTRICS_POST_SURVEY_URL_HERE" class="complete-btn">Complete Session →</a>
+      </div>
+      
+      <div class="session-history">
+        <button id="viewSessionBtn" class="view-session-toggle">View My Session <span class="session-count">(0)</span></button>
+        <div id="sessionPanel" class="session-panel">
+          <div id="sessionList" class="session-list">
+            <p class="session-empty">No reflections yet. Generate one to get started.</p>
+          </div>
+        </div>
+      </div>
+      
+      <p>ANIMA is a research prototype exploring how AI can support embodied self-understanding without diagnosis or optimization.</p>
+      <p class="footer-credit"><strong>Developed & Designed by Jess Adriana Rivera and Jessica Situ</strong></p>
+      <p>MIT MAS.S64: Designing AI for Human Flourishing</p>
+      <p class="footer-cite">Framework: Kim et al. (2025) "Reflective Agency Framework for AI-Mediated Self-Reflection Systems"</p>
+    </footer>
+  </div>
+
+  <script>
+    // ============================================
+    // CYCLE PHASE CONTEXT
+    // ============================================
+    const CYCLE_CONTEXTS = {
+      menstrual: {
+        baseline: 40,
+        description: '<strong>Menstrual phase (days 1-5):</strong> Estradiol is typically at its lowest. Lower E2 can correlate with fatigue, lower mood, or a need for rest. This is physiologically normal.',
+        aiContext: 'User is in menstrual phase when E2 is typically lowest. Fatigue, low mood, and need for rest are physiologically expected.'
+      },
+      follicular: {
+        baseline: 80,
+        description: '<strong>Follicular phase (days 6-13):</strong> Estradiol begins rising as follicles develop. Many experience gradually improving energy and mood during this phase.',
+        aiContext: 'User is in follicular phase when E2 is rising. Energy and mood often improve gradually during this time.'
+      },
+      ovulatory: {
+        baseline: 250,
+        description: '<strong>Ovulatory phase (days 14-16):</strong> Estradiol peaks around ovulation. Higher E2 is often associated with increased energy, heightened mood, and sometimes greater emotional sensitivity.',
+        aiContext: 'User is in ovulatory phase when E2 typically peaks. High energy and heightened emotional sensitivity are common.'
+      },
+      luteal: {
+        baseline: 130,
+        description: '<strong>Luteal phase (days 17-28):</strong> Estradiol is moderate but may fluctuate. Many experience variable mood, increased sensitivity, or PMS symptoms as the cycle progresses.',
+        aiContext: 'User is in luteal phase when E2 is moderate but variable. Mood fluctuations and increased sensitivity are common, especially in later luteal days.'
+      }
+    };
+    
+    let currentCyclePhase = 'menstrual';
+
+    // ============================================
+    // E2 SIMULATOR
+    // ============================================
+    const E2Simulator = {
+      series: [],
+      baseline: 40,
+      running: true,
+      listeners: [],
+      
+      setBaseline(newBaseline) {
+        this.baseline = newBaseline;
+      },
+      
+      step() {
+        let next;
+        if (this.series.length === 0) {
+          next = this.baseline + (Math.random() * 20 - 10);
+        } else {
+          const prev = this.series[this.series.length - 1].value;
+          const drift = (this.baseline - prev) * 0.04;
+          const shock = (Math.random() * 2 - 1) * 10;
+          next = prev + drift + shock;
+          if (Math.random() < 0.03) {
+            next += (Math.random() < 0.5 ? -1 : 1) * (15 + Math.random() * 30);
+          }
+        }
+        next = Math.max(15, Math.min(400, next));
+        this.series.push({ t: Date.now(), value: next });
+        if (this.series.length > 150) this.series = this.series.slice(-150);
+        this.listeners.forEach(cb => cb(this.series));
+      },
+      
+      start() {
+        this.step();
+        this.interval = setInterval(() => { if (this.running) this.step(); }, 2000);
+      },
+      
+      toggle() {
+        this.running = !this.running;
+        return this.running;
+      },
+      
+      onUpdate(cb) {
+        this.listeners.push(cb);
+      }
+    };
+
+    // ============================================
+    // FEATURE EXTRACTION
+    // ============================================
+    function extractFeatures(series, baseline) {
+      if (!series || series.length === 0) {
+        return { value: baseline, category: 'Normal', trend: 'Stable', delta10m: 0 };
+      }
+      const latest = series[series.length - 1];
+      const value = latest.value;
+      
+      const targetTime = latest.t - 10 * 60 * 1000;
+      let past = series[0];
+      for (let i = series.length - 1; i >= 0; i--) {
+        if (series[i].t <= targetTime) { past = series[i]; break; }
+      }
+      const delta10m = value - past.value;
+      
+      let category = 'Normal';
+      if (value < 40) category = 'Low';
+      else if (value > 200) category = 'Very High';
+      else if (value > 120) category = 'High';
+      
+      let trend = 'Stable';
+      if (delta10m > 5) trend = 'Rising';
+      else if (delta10m < -5) trend = 'Falling';
+      
+      return { value, category, trend, delta10m };
+    }
+
+    // ============================================
+    // TRUE AI REFLECTION (Claude API)
+    // ============================================
+    async function generateAIReflection(context) {
+        const { features, selfReport, cyclePhase } = context;
+        const cycleContext = CYCLE_CONTEXTS[cyclePhase];
+  
+      
+      const systemPrompt = `You are ANIMA, a reflective companion helping users develop hormonal self-understanding. You follow the Reflective Agency Framework (RAF).
+
+YOUR CORE PRINCIPLES:
+1. INTERNAL ORIGINATION: The user initiated this reflection. Honor their agency.
+2. CALIBRATED RESPONSIVENESS: Adapt your tone to their current state.
+3. REFLECTIVE AMBIGUITY: Offer possibilities, not conclusions. No diagnoses.
+4. TRANSPARENCY: Your reflection is informed by their E2 data and self-report.
+
+WHAT YOU MUST NEVER DO:
+- Diagnose any condition
+- Tell the user what they "should" do
+- Use clinical or optimization language
+- Claim certainty about what their experience means
+
+WHAT YOU ALWAYS DO:
+- Use hedging language: "might," "could," "some people find"
+- End with ONE gentle, open question they can sit with or ignore
+- Keep it to 3-4 sentences maximum
+- Acknowledge that your reading is just one lens
+
+CYCLE CONTEXT: ${cycleContext.aiContext}`;
+
+      const energyWords = ['drained', 'low', 'moderate', 'good', 'alive'];
+      const sensitivityWords = ['very tender', 'tender', 'moderate', 'resilient', 'very resilient'];
+      
+      const moodsText = selfReport.selectedMoods.length > 0 
+        ? selfReport.selectedMoods.join(', ')
+        : 'not specified';
+      
+      const userPrompt = `Current E2: ${features.value.toFixed(0)} pg/mL
+Category: ${features.category}
+Trend: ${features.trend} (${features.delta10m > 0 ? '+' : ''}${features.delta10m.toFixed(0)} over ~10min)
+Cycle Phase: ${cyclePhase}
+
+User Self-Report:
+- Feeling: ${moodsText}
+- Energy: ${energyWords[selfReport.energy - 1]}
+- Sensitivity: ${sensitivityWords[selfReport.sensitivity - 1]}
+${selfReport.journal ? `\nUser's journal note:\n"${selfReport.journal}"` : ''}
+
+Generate a brief, gentle reflection (3-4 sentences) that acknowledges their current state in relation to their E2 rhythm. End with one soft, open question.`;
+
+      try {
+    // 👉 call your own backend, NOT Anthropic directly
+    const response = await fetch('/api/anthropic', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ systemPrompt, userPrompt })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return {
+      text: data.reply,
+      source: 'Claude AI',
+      isAI: true
+    };
+  } catch (error) {
+    console.error('AI generation failed:', error);
+    return null;
+  }
+}
+
+    // ============================================
+    // FALLBACK: RAF-ALIGNED TEMPLATE GENERATION
+    // ============================================
+    /*
+     * REFLECTIVE AGENCY FRAMEWORK (RAF) IMPLEMENTATION
+     * Based on Kim et al. (2025)
+     * 
+     * This template system operationalizes RAF principles for offline use:
+     * 
+     * ┌─────────────────────────────────────────────────────────────────┐
+     * │ RAF PRINCIPLE          │ HOW TEMPLATES IMPLEMENT IT            │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ INTERNAL ORIGINATION   │ User pressed "Generate" — we never    │
+     * │ (IO)                   │ push reflections. Templates honor     │
+     * │                        │ that the user invited this.           │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ CALIBRATED             │ Response varies by E2 level, trend,   │
+     * │ RESPONSIVENESS (CR)    │ cycle phase, mood, energy, and        │
+     * │                        │ sensitivity. Low mood → warmer tone.  │
+     * │                        │ High energy → lighter touch.          │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ REFLECTIVE AMBIGUITY   │ All statements use hedging language:  │
+     * │ (RA)                   │ "might," "could," "sometimes," "may." │
+     * │                        │ No diagnoses. No "you should."        │
+     * │                        │ Multiple interpretations welcomed.    │
+     * │                        │ Ends with OPEN questions, not closed. │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ TRANSPARENCY OF        │ Reflection explicitly references the  │
+     * │ MEDIATION (TM)         │ E2 data informing it. User sees the   │
+     * │                        │ connection between data and response. │
+     * ├─────────────────────────────────────────────────────────────────┤
+     * │ SELF-CONTINUITY (SC)   │ Reflections don't reduce user to      │
+     * │                        │ hormones. Language supports ongoing   │
+     * │                        │ self-narrative, not fragmentation.    │
+     * └─────────────────────────────────────────────────────────────────┘
+     * 
+     * HUMAN FLOURISHING ALIGNMENT:
+     * - Goal is self-understanding, NOT optimization
+     * - Acceptance over fixing
+     * - Curiosity over judgment
+     * - Gentleness over productivity
+     */
+    
+    function generateTemplateReflection(context) {
+      const { features, selfReport, cyclePhase } = context;
+      const { category, trend, value } = features;
+      const { energy, sensitivity, journal, selectedMoods } = selfReport;
+      
+      // Helper: pick random from array
+      const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+      
+      const parts = [];
+      
+      // ─────────────────────────────────────────────────────────────
+      // LAYER 1: CYCLE-AWARE E2 CONTEXT
+      // RAF Principle: Transparency of Mediation (TM)
+      // Purpose: Ground reflection in observable data
+      // Language: Descriptive, not evaluative
+      // ─────────────────────────────────────────────────────────────
+      
+      const cycleOpenings = {
+        menstrual: {
+          'Low': [
+            'Your E2 is in a quieter range right now—common during menstruation.',
+            'Estradiol is sitting low, which often accompanies this part of the cycle.',
+            'E2 is on the lower end, as it tends to be during menstrual days.'
+          ],
+          'Normal': [
+            'E2 is moderate—your body may be beginning its gradual rise.',
+            'Estradiol is in a middle range, perhaps starting to build.',
+            'Your E2 reading is moderate, not unusual as menstruation winds down.'
+          ],
+          'High': [
+            'E2 is reading higher than typical for menstrual phase—bodies vary widely.',
+            'Estradiol is elevated; every cycle writes its own rhythm.',
+            'Your E2 is higher than expected—there\'s no single "correct" pattern.'
+          ]
+        },
+        follicular: {
+          'Low': [
+            'E2 is still building—follicular phase often starts quieter.',
+            'Estradiol hasn\'t peaked yet; this phase is about gradual rising.',
+            'Your E2 is on the lower side, though it typically climbs from here.'
+          ],
+          'Normal': [
+            'E2 is in a typical follicular range—a time when energy often builds.',
+            'Estradiol is moderate and likely rising; many feel gradual shifts now.',
+            'Your E2 sits in a common range for this phase of building.'
+          ],
+          'High': [
+            'E2 is elevated—you might be approaching ovulation sooner than expected.',
+            'Estradiol is running high; your cycle may be moving quickly.',
+            'Your E2 has risen notably—bodies don\'t follow textbook timelines.'
+          ]
+        },
+        ovulatory: {
+          'Low': [
+            'E2 is lower than typical for ovulation—though peaks vary person to person.',
+            'Estradiol isn\'t showing a strong peak right now; cycles differ.',
+            'Your E2 is moderate; not every ovulatory window looks the same.'
+          ],
+          'Normal': [
+            'E2 is moderate—it may still be climbing or settling from a peak.',
+            'Estradiol is in a middle range; ovulation can be subtle.',
+            'Your E2 suggests you\'re somewhere in the ovulatory window.'
+          ],
+          'High': [
+            'E2 is elevated, consistent with an ovulatory surge.',
+            'Estradiol is high—this often accompanies mid-cycle.',
+            'Your E2 is peaking, which aligns with ovulatory timing.'
+          ],
+          'Very High': [
+            'E2 is quite high right now—a strong ovulatory signature.',
+            'Estradiol has surged notably; this is a high-E2 moment.',
+            'Your E2 is at a peak—some feel heightened everything here.'
+          ]
+        },
+        luteal: {
+          'Low': [
+            'E2 has dropped lower—common as luteal phase progresses.',
+            'Estradiol is quieter now; the body may be winding toward menstruation.',
+            'Your E2 is low, which can happen in later luteal days.'
+          ],
+          'Normal': [
+            'E2 is moderate—luteal phase often brings fluctuation.',
+            'Estradiol is in a typical range for post-ovulation days.',
+            'Your E2 is moderate; luteal phase can feel variable.'
+          ],
+          'High': [
+            'E2 is elevated—luteal phase doesn\'t always mean low estradiol.',
+            'Estradiol is higher than expected; bodies don\'t follow scripts.',
+            'Your E2 is running high; luteal variability is real.'
+          ],
+          'Very High': [
+            'E2 is quite high for luteal phase—unusual but not wrong.',
+            'Estradiol remains elevated; your pattern is your pattern.',
+            'Your E2 hasn\'t dropped as expected—every cycle is different.'
+          ]
+        }
+      };
+      
+      const phaseOpenings = cycleOpenings[cyclePhase] || cycleOpenings.follicular;
+      const categoryOptions = phaseOpenings[category] || phaseOpenings['Normal'] || ['E2 is in a moderate range right now.'];
+      parts.push(pick(Array.isArray(categoryOptions) ? categoryOptions : [categoryOptions]));
+      
+      // ─────────────────────────────────────────────────────────────
+      // LAYER 2: TREND CONTEXT
+      // RAF Principle: Reflective Ambiguity (RA)
+      // Purpose: Offer possible meaning without claiming certainty
+      // Language: "might," "can," "sometimes"
+      // ─────────────────────────────────────────────────────────────
+      
+      const trendResponses = {
+        'Rising': [
+          'The upward movement might bring shifting sensations or energy.',
+          'As E2 rises, some notice subtle changes in how they feel.',
+          'This climbing pattern sometimes correlates with increased sensitivity.',
+          'The rising trend could mean your body is moving toward something.'
+        ],
+        'Falling': [
+          'The downward drift can sometimes accompany quieter or heavier feelings.',
+          'As E2 eases, some find their energy or mood settling too.',
+          'This falling pattern might bring a need for more gentleness.',
+          'The downward movement may invite a slower pace.'
+        ],
+        'Stable': [
+          'E2 is holding steady for now—a moment of relative stillness.',
+          'The stability might feel like a pause, or go unnoticed entirely.',
+          'Sometimes steadiness is its own kind of information.'
+        ]
+      };
+      
+      if (trendResponses[trend]) {
+        parts.push(pick(trendResponses[trend]));
+      }
+      
+      // ─────────────────────────────────────────────────────────────
+      // LAYER 3: STATE ACKNOWLEDGMENT (Based on Self-Report)
+      // RAF Principle: Calibrated Responsiveness (CR)
+      // Purpose: Meet user where they are emotionally
+      // Language: Validating without diagnosing
+      // Human Flourishing: Acceptance over optimization
+      // ─────────────────────────────────────────────────────────────
+      
+      const lowMoodResponses = [
+        'If things feel heavy right now, that\'s allowed.',
+        'Heaviness in this moment isn\'t a problem to solve—it\'s information.',
+        'If you\'re moving through something difficult, there\'s no rush.',
+        'Low moments are part of the rhythm, not a failure of it.',
+        'Whatever weight you\'re carrying right now deserves acknowledgment.'
+      ];
+      
+      const lowEnergyResponses = [
+        'If energy feels scarce, your body might be asking for something.',
+        'Low energy isn\'t laziness—it\'s often the body\'s wisdom.',
+        'Depletion is a signal, not a flaw.',
+        'If you\'re running on empty, that\'s worth noticing.',
+        'Sometimes low energy is an invitation to slow down.'
+      ];
+      
+      const highSensitivityResponses = [
+        'Feeling porous—like everything gets in—can be intense but isn\'t wrong.',
+        'Heightened sensitivity sometimes means the world feels louder.',
+        'If you\'re more affected by things than usual, that\'s a pattern worth noticing.',
+        'Some moments we\'re more permeable; this might be one.',
+        'Sensitivity can be overwhelming, and it can also be a kind of attunement.'
+      ];
+      
+      const neutralResponses = [
+        'However you\'re feeling right now has its own validity.',
+        'There\'s no particular way you\'re supposed to feel.',
+        'This moment is just this moment—no more, no less.',
+        'Whatever is present for you right now is welcome here.'
+      ];
+      
+      // Check for difficult mood selections
+      const difficultMoods = ['anxious', 'irritable', 'disconnected', 'tired', 'withdrawn'];
+      const hasDifficultMood = selectedMoods.some(m => difficultMoods.includes(m));
+      
+      // Calibrate response based on state
+      // Note: sensitivity scale is now tender(1) to resilient(5), so low = tender/sensitive
+      if (hasDifficultMood) {
+        parts.push(pick(lowMoodResponses));
+      } else if (energy <= 2) {
+        parts.push(pick(lowEnergyResponses));
+      } else if (sensitivity <= 2) {
+        parts.push(pick(highSensitivityResponses));
+      } else if (Math.random() > 0.5) {
+        // Sometimes add a neutral acknowledgment even when state is "fine"
+        parts.push(pick(neutralResponses));
+      }
+      
+      // ─────────────────────────────────────────────────────────────
+      // LAYER 4: VISUAL MOOD ECHO
+      // RAF Principle: Self-Continuity (SC)
+      // Purpose: Reflect user's own language back to them
+      // Language: Honoring their naming without interpreting
+      // ─────────────────────────────────────────────────────────────
+      
+      const moodEchoResponses = {
+        'excited': [
+          'You named "excited"—something is alive and moving in you.',
+          '"Excited" suggests anticipation or possibility. That energy is real.',
+          'Excitement can be a resource; it can also need grounding.'
+        ],
+        'motivated': [
+          'You chose "motivated"—there\'s direction in you right now.',
+          '"Motivated" suggests something is pulling you forward.',
+          'Motivation is its own kind of energy. What does it want?'
+        ],
+        'calm': [
+          'You named this moment "calm"—let that quality be present.',
+          '"Calm" is what you\'re noticing. That awareness itself is something.',
+          'The calm you identified might be worth protecting right now.'
+        ],
+        'content': [
+          'You chose "content"—a kind of enoughness in this moment.',
+          '"Content" suggests something settled. That\'s worth noticing.',
+          'Contentment, when it arrives, doesn\'t always announce itself.'
+        ],
+        'peaceful': [
+          'You named "peaceful"—a quality of stillness or ease.',
+          '"Peaceful" is its own kind of gift. You might want to stay here.',
+          'Peace, even temporary, is something to acknowledge.'
+        ],
+        'anxious': [
+          'You chose "anxious"—something in you is activated or uncertain.',
+          '"Anxious" takes courage to name. It\'s a signal, not a flaw.',
+          'Anxiety often carries information. You don\'t have to solve it right now.'
+        ],
+        'irritable': [
+          'You named "irritable"—things are getting under your skin.',
+          '"Irritable" suggests your edges are sensitive right now.',
+          'Irritability can be a sign that something needs attention or protection.'
+        ],
+        'restless': [
+          'You named "restless"—something in you wants movement.',
+          '"Restless" might be energy without a clear direction.',
+          'Restlessness can be uncomfortable; it can also signal readiness for change.'
+        ],
+        'disconnected': [
+          'You chose "disconnected"—a feeling of distance from yourself or others.',
+          '"Disconnected" might be protection, or it might be depletion.',
+          'Disconnection is sometimes the body\'s way of coping.'
+        ],
+        'tired': [
+          'You named "tired"—your reserves are low right now.',
+          '"Tired" is honest. Rest might be what\'s needed.',
+          'Tiredness is a signal, not a weakness. What would feel restorative?'
+        ],
+        'withdrawn': [
+          'You chose "withdrawn"—a pulling back from the world.',
+          '"Withdrawn" might be self-protection, or it might be overwhelm.',
+          'Withdrawal can be healthy when you need to regroup.'
+        ]
+      };
+      
+      // Echo selected moods (pick one if multiple selected)
+      if (selectedMoods.length > 0) {
+        const moodToEcho = pick(selectedMoods.filter(m => moodEchoResponses[m]));
+        if (moodToEcho && moodEchoResponses[moodToEcho]) {
+          parts.push(pick(moodEchoResponses[moodToEcho]));
+        }
+      }
+      
+      // ─────────────────────────────────────────────────────────────
+      // LAYER 5: JOURNAL ACKNOWLEDGMENT
+      // RAF Principle: Internal Origination (IO) + Self-Continuity (SC)
+      // Purpose: Honor what user chose to share
+      // Language: Witnessing without analyzing
+      // ─────────────────────────────────────────────────────────────
+      
+      if (journal && journal.length > 15) {
+        const journalResponses = [
+          'What you wrote holds something—it doesn\'t need to be explained further.',
+          'The words you put down carry their own weight.',
+          'You chose to write something; that impulse matters.',
+          'What you shared is witnessed, without judgment.',
+          'Sometimes writing something is its own form of processing.',
+          'The act of naming what\'s present can shift how it feels.',
+          'Your words are here. They don\'t need to be fixed or solved.'
+        ];
+        parts.push(pick(journalResponses));
+      }
+      
+      // ─────────────────────────────────────────────────────────────
+      // LAYER 6: CLOSING QUESTION
+      // RAF Principle: Reflective Ambiguity (RA)
+      // Purpose: Invite continued reflection without directing it
+      // Language: Open-ended, gentle, optional
+      // Human Flourishing: Curiosity over prescription
+      // ─────────────────────────────────────────────────────────────
+      
+      const closingQuestions = [
+        // Body-oriented
+        'What does your body seem to be asking for right now?',
+        'If your body could speak, what might it say?',
+        'What\'s one small thing that might feel nourishing?',
+        'Is there something physical that would feel supportive?',
+        
+        // Emotional attunement
+        'What feels true about this moment, even if you can\'t explain it?',
+        'Is there an emotion here that wants to be noticed?',
+        'What might you need that you haven\'t named yet?',
+        'If this feeling had a message, what might it be?',
+        
+        // Permission-oriented
+        'What would feel like enough for the next hour?',
+        'Is there something you\'re allowed to let go of right now?',
+        'What permission might you give yourself today?',
+        'What would kindness toward yourself look like in this moment?',
+        
+        // Open awareness
+        'Is there something here worth staying curious about?',
+        'What might shift if you didn\'t try to change anything?',
+        'Is this moment asking something of you, or just passing through?',
+        'What would it mean to simply be with what\'s here?'
+      ];
+      
+      parts.push(pick(closingQuestions));
+      
+      // ─────────────────────────────────────────────────────────────
+      // ASSEMBLE REFLECTION
+      // ─────────────────────────────────────────────────────────────
+      
+      return {
+        text: parts.join(' '),
+        source: 'RAF Templates',
+        isAI: false
+      };
+    }
+
+    // ============================================
+    // CHART RENDERING
+    // ============================================
+    const chartCanvas = document.getElementById('e2Chart');
+    const ctx = chartCanvas.getContext('2d');
+    
+    function drawChart(series, baseline) {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = chartCanvas.getBoundingClientRect();
+      chartCanvas.width = rect.width * dpr;
+      chartCanvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      const width = rect.width;
+      const height = rect.height;
+      
+      ctx.fillStyle = 'rgba(0,0,0,0.03)';
+      ctx.fillRect(0, 0, width, height);
+      
+      if (!series || series.length === 0) return;
+      
+      const values = series.map(s => s.value);
+      const minVal = Math.min(...values, baseline * 0.5) - 10;
+      const maxVal = Math.max(...values, baseline * 1.5) + 10;
+      const span = maxVal - minVal || 1;
+      const padding = 6;
+      
+      // Baseline - subtle gray
+      const baseNorm = (baseline - minVal) / span;
+      const baseY = height - padding - baseNorm * (height - padding * 2);
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(padding, baseY);
+      ctx.lineTo(width - padding, baseY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // E2 line - muted lavender-gray
+      ctx.strokeStyle = 'rgba(120,100,160,0.65)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      series.forEach((s, i) => {
+        const x = padding + (i / (series.length - 1 || 1)) * (width - padding * 2);
+        const norm = (s.value - minVal) / span;
+        const y = height - padding - norm * (height - padding * 2);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+    }
+
+    // ============================================
+    // UI STATE & EVENT HANDLERS
+    // ============================================
+    let currentFeatures = null;
+
+    // Cycle phase selection
+    document.getElementById('cycleOptions').addEventListener('click', (e) => {
+      const option = e.target.closest('.cycle-option');
+      if (!option) return;
+      
+      document.querySelectorAll('.cycle-option').forEach(o => o.classList.remove('selected'));
+      option.classList.add('selected');
+      
+      currentCyclePhase = option.dataset.phase;
+      const newBaseline = parseInt(option.dataset.baseline);
+      E2Simulator.setBaseline(newBaseline);
+      E2Simulator.baseline = newBaseline;
+      
+      document.getElementById('cycleContext').innerHTML = CYCLE_CONTEXTS[currentCyclePhase].description;
+    });
+
+    // E2 updates
+    E2Simulator.onUpdate(series => {
+      currentFeatures = extractFeatures(series, E2Simulator.baseline);
+      document.getElementById('e2Value').textContent = currentFeatures.value.toFixed(0);
+      
+      const catEl = document.getElementById('e2Category');
+      catEl.textContent = currentFeatures.category;
+      catEl.className = 'e2-category ' + currentFeatures.category.toLowerCase().replace(' ', '-');
+      
+      document.getElementById('e2Trend').textContent = currentFeatures.trend;
+      drawChart(series, E2Simulator.baseline);
+    });
+
+    // Simulator toggle
+    document.getElementById('toggleSimulator').addEventListener('click', (e) => {
+      const running = E2Simulator.toggle();
+      e.target.textContent = running ? 'Pause' : 'Resume';
+    });
+
+    // Mood chips - multi-select
+    let selectedMoods = [];
+    
+    document.getElementById('moodChips').addEventListener('click', (e) => {
+      if (e.target.classList.contains('mood-chip')) {
+        const mood = e.target.dataset.mood;
+        
+        // Toggle this mood
+        if (e.target.classList.contains('selected')) {
+          e.target.classList.remove('selected');
+          selectedMoods = selectedMoods.filter(m => m !== mood);
+        } else {
+          e.target.classList.add('selected');
+          selectedMoods.push(mood);
+        }
+      }
+    });
+
+    
+    // Reflection limit for Prolific
+    const MAX_REFLECTIONS = 5;
+    let reflectionsUsed = 0;
+    
+    function updateReflectionCounter() {
+      const remaining = MAX_REFLECTIONS - reflectionsUsed;
+      const counter = document.getElementById('reflectionCounter');
+      const btn = document.getElementById('generateBtn');
+      const limitDiv = document.querySelector('.reflection-limit');
+      
+      if (remaining <= 0) {
+        counter.textContent = 'No reflections remaining';
+        limitDiv.classList.add('depleted');
+        limitDiv.classList.remove('warning');
+        btn.disabled = true;
+        btn.textContent = 'Limit Reached';
+      } else if (remaining <= 2) {
+        counter.textContent = `${remaining} reflection${remaining === 1 ? '' : 's'} remaining`;
+        limitDiv.classList.add('warning');
+        limitDiv.classList.remove('depleted');
+      } else {
+        counter.textContent = `${remaining} reflections remaining`;
+        limitDiv.classList.remove('warning', 'depleted');
+      }
+    }
+    
+    // Session tracking
+    const sessionData = {
+      startTime: new Date().toISOString(),
+      reflections: []
+    };
+    
+    // Mode toggle
+    let currentMode = 'ai'; // 'ai' or 'offline'
+    
+    document.querySelectorAll('.mode-option').forEach(option => {
+      option.addEventListener('click', () => {
+        document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+        currentMode = option.dataset.mode;
+      });
+    });
+    
+    // View Session toggle
+    document.getElementById('viewSessionBtn').addEventListener('click', () => {
+      document.getElementById('sessionPanel').classList.toggle('visible');
+    });
+    
+    // Function to update session panel
+    function updateSessionPanel() {
+      const count = sessionData.reflections.length;
+      document.querySelector('.session-count').textContent = `(${count})`;
+      
+      const list = document.getElementById('sessionList');
+      if (count === 0) {
+        list.innerHTML = '<p class="session-empty">No reflections yet. Generate one to get started.</p>';
+        return;
+      }
+      
+      list.innerHTML = sessionData.reflections.map((r, i) => `
+        <div class="session-item" data-index="${i}">
+          <div class="session-item-header">
+            <span>#${i + 1} · ${r.time} · E2: ${r.e2} pg/mL</span>
+            <span class="session-item-source ${r.source === 'Claude AI' ? 'ai' : ''}">${r.source}</span>
+          </div>
+          <p class="session-item-text">${r.text}</p>
+          ${r.userThoughts ? `
+            <div class="session-item-thoughts">
+              <div class="session-item-thoughts-label">My thoughts</div>
+              ${r.userThoughts}
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    // RAF info toggle
+    document.getElementById('rafInfoBtn').addEventListener('click', () => {
+      document.getElementById('rafPanel').classList.toggle('visible');
+    });
+
+    // Generate reflection
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+      if (!currentFeatures) return;
+      
+      // Check reflection limit
+      if (reflectionsUsed >= MAX_REFLECTIONS) {
+        return;
+      }
+      
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></span>';
+      
+      const selfReport = {
+        energy: parseInt(document.getElementById('energySlider').value),
+        sensitivity: parseInt(document.getElementById('sensitivitySlider').value),
+        journal: document.getElementById('journalInput').value.trim(),
+        selectedMoods: selectedMoods.length > 0 ? selectedMoods : []
+      };
+      
+      const context = {
+        features: currentFeatures,
+        selfReport,
+        cyclePhase: currentCyclePhase
+      };
+      
+      let result;
+      
+      if (currentMode === 'ai') {
+  result = await generateAIReflection(context);
+  if (!result) {
+    // Fallback to templates if API fails
+    result = generateTemplateReflection(context);
+  }
+} else {
+        // Offline mode - use templates with slight delay for UX
+        await new Promise(r => setTimeout(r, 600));
+        result = generateTemplateReflection(context);
+      }
+      
+      // Determine response level based on difficult moods or low energy
+      // Note: sensitivity scale is tender(1) to resilient(5), so low number = more sensitive
+      const difficultMoods = ['anxious', 'irritable', 'disconnected', 'tired', 'withdrawn'];
+      const hasDifficultMood = selfReport.selectedMoods.some(m => difficultMoods.includes(m));
+      const responseLevel = (hasDifficultMood || selfReport.energy <= 2 || selfReport.sensitivity <= 2) 
+        ? 'supportive' : 'gentle';
+      
+      // Save to session for download
+      sessionData.reflections.push({
+        time: new Date().toLocaleTimeString(),
+        e2: currentFeatures.value.toFixed(0),
+        category: currentFeatures.category,
+        trend: currentFeatures.trend,
+        phase: currentCyclePhase,
+        moods: selfReport.selectedMoods.join(', '),
+        energy: selfReport.energy,
+        sensitivity: selfReport.sensitivity,
+        source: result.source,
+        text: result.text
+      });
+      
+      // Update the session panel
+      updateSessionPanel();
+      
+      // Increment reflection counter
+      reflectionsUsed++;
+      updateReflectionCounter();
+      
+      document.getElementById('reflectionContainer').innerHTML = `
+        <div class="reflection-card">
+          <div class="reflection-header">
+            <div>
+              <span class="reflection-label">Reflection</span>
+              <span class="reflection-source ${result.isAI ? 'ai' : ''}">${result.source}</span>
+            </div>
+            <button class="dismiss-btn" onclick="this.closest('.reflection-card').remove()">×</button>
+          </div>
+          <p class="reflection-text">${result.text}</p>
+          <div class="reflection-meta">
+            <span class="meta-tag">E2: ${currentFeatures.value.toFixed(0)} pg/mL</span>
+            <span class="meta-tag">${currentFeatures.category}</span>
+            <span class="meta-tag">${currentFeatures.trend}</span>
+            <span class="meta-tag">Phase: ${currentCyclePhase}</span>
+          </div>
+          
+          <div class="reflection-response">
+            <div class="response-buttons">
+              <button class="response-btn resonates" onclick="this.classList.toggle('active')">
+                This resonates
+              </button>
+              <button class="response-btn another" onclick="document.getElementById('generateBtn').click(); this.closest('.reflection-card').remove();">
+                Try another
+              </button>
+              <button class="response-btn sit" onclick="this.closest('.reflection-card').classList.add('sitting'); setTimeout(() => this.closest('.reflection-card').remove(), 1500);">
+                Sit with this
+              </button>
+            </div>
+            
+            <div class="add-thoughts">
+              <button class="add-thoughts-toggle" onclick="this.nextElementSibling.classList.toggle('visible'); this.classList.toggle('active');">
+                + Add my thoughts
+              </button>
+              <div class="thoughts-input-container">
+                <textarea class="thoughts-input" placeholder="What comes up for you? This is just for you—the AI won't respond."></textarea>
+                <button class="thoughts-save" onclick="
+                  const text = this.previousElementSibling.value.trim();
+                  if (text) {
+                    const lastReflection = sessionData.reflections[sessionData.reflections.length - 1];
+                    if (lastReflection) {
+                      lastReflection.userThoughts = text;
+                      updateSessionPanel();
+                    }
+                    this.previousElementSibling.value = '';
+                    this.previousElementSibling.placeholder = 'Saved ✓';
+                    setTimeout(() => {
+                      this.parentElement.classList.remove('visible');
+                      this.parentElement.previousElementSibling.classList.remove('active');
+                      this.previousElementSibling.placeholder = 'What comes up for you? This is just for you—the AI won\\'t respond.';
+                    }, 800);
+                  }
+                ">Save to session</button>
+              </div>
+            </div>
+          </div>
+          
+          <p class="reflection-disclaimer">This reflection is not advice or diagnosis—it offers one possible lens on your current moment.</p>
+        </div>
+      `;
+      
+      btn.disabled = false;
+      btn.textContent = 'Generate Reflection';
+      
+      // Re-check limit in case we just hit it
+      if (reflectionsUsed >= MAX_REFLECTIONS) {
+        btn.disabled = true;
+        btn.textContent = 'Limit Reached';
+      }
+    });
+
+    // Start
+    E2Simulator.start();
+  </script>
+</body>
+</html>
