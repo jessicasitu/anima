@@ -1,4 +1,15 @@
+
 export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  return res.status(200).json({
+    reply: 'This is a test reflection coming from your /api/anthropic backend, not the templates.'
+  });
+}
+
+//export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -50,4 +61,4 @@ export default async function handler(req, res) {
     console.error('Server error:', err);
     return res.status(500).json({ error: 'Server error' });
   }
-}
+//}
