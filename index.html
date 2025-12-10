@@ -1139,8 +1139,7 @@ YOUR TASK: Generate a brief, gentle reflection (2-3 sentences) that acknowledges
 Respond with ONLY the reflection text (no headings, no labels, no meta commentary).`;
 
       try {
-        // UPDATE THIS URL to your deployed Vercel function URL
-        const apiUrl = 'https://anima-flsh1ptdq-jessicas-projects-f7c94e3f.vercel.app/api/claude';
+        const apiUrl = 'https://anima-flsh1ptdq-jessicas-projects-f7c94e3f.vercel.app/api/anthropic';
         
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -1148,12 +1147,8 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 300,
-            system: systemPrompt,
-            messages: [
-              { role: 'user', content: userPrompt }
-            ]
+            systemPrompt: systemPrompt,
+            userPrompt: userPrompt
           })
         });
 
@@ -1163,13 +1158,8 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
 
         const data = await response.json();
         
-        let text = '';
-        if (data.content && Array.isArray(data.content)) {
-          text = data.content
-            .filter(block => block.type === 'text')
-            .map(block => block.text)
-            .join('\n');
-        }
+        // Your serverless function returns { reply: "text" }
+        const text = data.reply || '';
         
         return {
           text: text || 'Unable to generate reflection.',
