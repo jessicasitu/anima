@@ -1139,9 +1139,8 @@ YOUR TASK: Generate a brief, gentle reflection (2-3 sentences) that acknowledges
 Respond with ONLY the reflection text (no headings, no labels, no meta commentary).`;
 
       try {
-        const apiUrl = 'https://anima-flsh1ptdq-jessicas-projects-f7c94e3f.vercel.app/api/anthropic';
-        
-        const response = await fetch(apiUrl, {
+        // Call Vercel serverless function (API key is hidden on server)
+        const response = await fetch('/api/anthropic', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json'
@@ -1153,12 +1152,14 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
         });
 
         if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('API error:', response.status, errorData);
           throw new Error(`API error: ${response.status}`);
         }
 
         const data = await response.json();
         
-        // Your serverless function returns { reply: "text" }
+        // The Vercel function returns { reply: "text" }
         const text = data.reply || '';
         
         return {
