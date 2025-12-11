@@ -861,12 +861,23 @@
           e2History: Analytics.e2History
         };
         
-        // Use sendBeacon with Blob for reliable delivery
-        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-        const sent = navigator.sendBeacon(GOOGLE_SHEETS_URL, blob);
-        console.log('Data sent via sendBeacon:', sent, data);
+        // Use fetch with no-cors mode for reliable delivery
+        fetch(GOOGLE_SHEETS_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        }).then(() => {
+          console.log('Data sent to Google Sheets');
+        }).catch(err => {
+          console.error('Fetch error:', err);
+        });
         
-        // Small delay to ensure beacon is sent, then redirect
+        console.log('Data being sent:', data);
+        
+        // Small delay to ensure request is sent, then redirect
         setTimeout(() => {
           if (prolificPid) {
             window.location.href = `${postSurveyBase}?PROLIFIC_PID=${encodeURIComponent(prolificPid)}`;
