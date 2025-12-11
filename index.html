@@ -775,13 +775,13 @@
     const sentReflections = new Set();
     
     // Send data for a specific reflection (called after each AI response)
-    function sendReflectionData(reflectionNumber, aiResponse, selfReportAtTime, continuedThoughts = []) {
+    function sendReflectionData(reflectionNumber, aiResponse, selfReportAtTime, continuedThoughts = [], forceUpdate = false) {
       const reflectionKey = `${visitorId}_${reflectionNumber}`;
       const isUpdate = sentReflections.has(reflectionKey);
       
-      // Always send if it's an update with new continued thoughts
-      // Skip only if it's a duplicate initial send (no continued thoughts and already sent)
-      if (isUpdate && continuedThoughts.length === 0) {
+      // Skip only if it's a duplicate initial send with no new data
+      // Allow updates for: continued thoughts, resonance changes (forceUpdate), or first send
+      if (isUpdate && continuedThoughts.length === 0 && !forceUpdate) {
         console.log('Skipping duplicate send for reflection', reflectionNumber);
         return;
       }
@@ -1763,12 +1763,13 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
       if (reflectionSnapshots[reflectionsUsed]) {
         reflectionSnapshots[reflectionsUsed].resonated = didResonate ? 'yes' : 'no';
         
-        // Send updated data with resonance
+        // Send updated data with resonance (forceUpdate = true to ensure it sends)
         sendReflectionData(
           reflectionsUsed, 
           reflectionSnapshots[reflectionsUsed].aiResponse, 
           reflectionSnapshots[reflectionsUsed],
-          reflectionSnapshots[reflectionsUsed].continuedThoughts
+          reflectionSnapshots[reflectionsUsed].continuedThoughts,
+          true  // forceUpdate - always send resonance updates
         );
       }
       
