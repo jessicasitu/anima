@@ -767,6 +767,86 @@
       
       return { deviceType, browser, screenWidth: window.innerWidth };
     }
+    
+    // ============================================
+    // SEND DATA PER REFLECTION
+    // ============================================
+    // Track which reflections have been sent to avoid duplicates
+    const sentReflections = new Set();
+    
+    // Send data for a specific reflection (called after each AI response)
+    function sendReflectionData(reflectionNumber, aiResponse, selfReportAtTime, continuedThoughts = []) {
+      // Avoid sending duplicate data for same reflection
+      const reflectionKey = `${visitorId}_${reflectionNumber}`;
+      if (sentReflections.has(reflectionKey) && continuedThoughts.length === 0) {
+        return; // Already sent initial data, only update if there are new continued thoughts
+      }
+      
+      const deviceInfo = getDeviceInfo();
+      const sessionId = (prolificPid && prolificPid.length > 0) ? prolificPid : visitorId;
+      
+      const data = {
+        // IDENTIFIERS
+        visitorId: visitorId,
+        sessionId: sessionId,
+        
+        // REFLECTION INFO
+        reflectionNumber: reflectionNumber,
+        totalReflectionsInSession: reflectionsUsed,
+        
+        // SELF-REPORT AT TIME OF THIS REFLECTION
+        cyclePhase: selfReportAtTime.cyclePhase,
+        energyLevel: selfReportAtTime.energy,
+        stressLevel: selfReportAtTime.stress,
+        selectedMoods: selfReportAtTime.selectedMoods.join(', '),
+        journalEntry: selfReportAtTime.journal,
+        
+        // E2 AT TIME OF THIS REFLECTION
+        e2Value: selfReportAtTime.e2Value || '',
+        e2Trend: selfReportAtTime.e2Trend || '',
+        
+        // AI RESPONSE
+        aiReflectionText: aiResponse,
+        
+        // USER'S CONTINUED THOUGHTS (for this specific reflection)
+        continuedThoughts: continuedThoughts.join(' | '),
+        continuedThoughtsCount: continuedThoughts.length,
+        
+        // RESONANCE FOR THIS REFLECTION
+        resonated: selfReportAtTime.resonated || '',
+        
+        // TIMING
+        timestamp: new Date().toISOString(),
+        sessionDuration: Analytics.getSessionDuration(),
+        
+        // TECHNICAL
+        deviceType: deviceInfo.deviceType,
+        screenWidth: deviceInfo.screenWidth,
+        browserType: deviceInfo.browser,
+        
+        // FLAG
+        isUpdate: sentReflections.has(reflectionKey)
+      };
+      
+      sentReflections.add(reflectionKey);
+      
+      // Send to Google Sheets
+      fetch(GOOGLE_SHEETS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      }).then(() => {
+        console.log(`Reflection ${reflectionNumber} data sent:`, data);
+      }).catch(err => {
+        console.error('Error sending reflection data:', err);
+      });
+    }
+    
+    // Store self-report snapshots per reflection for later updates
+    const reflectionSnapshots = {};
 
     // ============================================
     // QUALTRICS / PROLIFIC INTEGRATION
@@ -1513,6 +1593,23 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
       reflectionsUsed++;
       updateReflectionCounter();
       
+      // Store snapshot for this reflection (for later updates with continued thoughts)
+      reflectionSnapshots[reflectionsUsed] = {
+        cyclePhase: context.cyclePhase,
+        energy: context.selfReport.energy,
+        stress: context.selfReport.stress,
+        selectedMoods: [...context.selfReport.selectedMoods],
+        journal: context.selfReport.journal,
+        e2Value: context.features ? context.features.value.toFixed(0) : '',
+        e2Trend: context.features ? context.features.trend : '',
+        aiResponse: result.text,
+        continuedThoughts: [],
+        resonated: ''
+      };
+      
+      // Send initial data for this reflection
+      sendReflectionData(reflectionsUsed, result.text, reflectionSnapshots[reflectionsUsed]);
+      
       // Render reflection card
       renderReflectionCard(result, context);
       
@@ -1583,6 +1680,11 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
       // Add user response to conversation thread FIRST
       ConversationThread.add('user', userResponse);
       
+      // Track this continued thought for the current reflection
+      if (reflectionSnapshots[reflectionsUsed]) {
+        reflectionSnapshots[reflectionsUsed].continuedThoughts.push(userResponse);
+      }
+      
       const context = getCurrentContext();
       
       // Generate AI response with isFollowUp=true and the EXACT user response
@@ -1597,8 +1699,21 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
         };
       }
       
-      // Add AI response to thread
+      // Add AI response to thread and track it
       ConversationThread.add('reflection', result.text, { source: result.source });
+      
+      // Add the AI follow-up response to continued thoughts too
+      if (reflectionSnapshots[reflectionsUsed]) {
+        reflectionSnapshots[reflectionsUsed].continuedThoughts.push(`[AI]: ${result.text}`);
+        
+        // Send updated data with continued thoughts
+        sendReflectionData(
+          reflectionsUsed, 
+          reflectionSnapshots[reflectionsUsed].aiResponse, 
+          reflectionSnapshots[reflectionsUsed],
+          reflectionSnapshots[reflectionsUsed].continuedThoughts
+        );
+      }
       
       updateSessionPanel();
       
@@ -1633,6 +1748,19 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
         resonated: didResonate,
         reflectionIndex: ConversationThread.getHistory().filter(e => e.type === 'reflection').length
       });
+      
+      // Update the reflection snapshot with resonance
+      if (reflectionSnapshots[reflectionsUsed]) {
+        reflectionSnapshots[reflectionsUsed].resonated = didResonate ? 'yes' : 'no';
+        
+        // Send updated data with resonance
+        sendReflectionData(
+          reflectionsUsed, 
+          reflectionSnapshots[reflectionsUsed].aiResponse, 
+          reflectionSnapshots[reflectionsUsed],
+          reflectionSnapshots[reflectionsUsed].continuedThoughts
+        );
+      }
       
       console.log('Resonance tracked:', resonanceData);
       
