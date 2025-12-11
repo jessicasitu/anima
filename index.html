@@ -1748,15 +1748,11 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
 
     // Handle resonance feedback
     function handleResonance(btn, didResonate, reflectionNum) {
-      console.log('handleResonance called:', { didResonate, reflectionNum, reflectionsUsed });
-      
       btn.parentElement.querySelectorAll('.response-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       
       // Use passed reflectionNum, or fall back to current reflectionsUsed
       const targetReflection = reflectionNum || reflectionsUsed;
-      console.log('Target reflection:', targetReflection);
-      console.log('Snapshot exists:', !!reflectionSnapshots[targetReflection]);
       
       // Track the feedback
       if (didResonate) {
@@ -1827,7 +1823,27 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
         updateSessionPanel();
         reflectionsUsed++;
         updateReflectionCounter();
-        renderReflectionCard(result, context);
+        
+        // Create snapshot for this regenerated reflection (same as regular reflection)
+        reflectionSnapshots[reflectionsUsed] = {
+          cyclePhase: context.cyclePhase,
+          energy: context.selfReport.energy,
+          stress: context.selfReport.stress,
+          selectedMoods: [...context.selfReport.selectedMoods],
+          journal: context.selfReport.journal,
+          e2Value: context.features ? context.features.value.toFixed(0) : '',
+          e2Trend: context.features ? context.features.trend : '',
+          aiResponse: result.text,
+          continuedThoughts: [],
+          resonated: '',
+          wasRegenerated: true  // Flag that this came from "Try Again"
+        };
+        
+        // Send data for this regenerated reflection
+        sendReflectionData(reflectionsUsed, result.text, reflectionSnapshots[reflectionsUsed]);
+        
+        // Render with correct reflection number
+        renderReflectionCard(result, context, reflectionsUsed);
       }
       
       btn.disabled = false;
