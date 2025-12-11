@@ -776,63 +776,59 @@
     
     // Send data for a specific reflection (called after each AI response)
     function sendReflectionData(reflectionNumber, aiResponse, selfReportAtTime, continuedThoughts = []) {
-      // Avoid sending duplicate data for same reflection
       const reflectionKey = `${visitorId}_${reflectionNumber}`;
-      if (sentReflections.has(reflectionKey) && continuedThoughts.length === 0) {
-        return; // Already sent initial data, only update if there are new continued thoughts
+      const isUpdate = sentReflections.has(reflectionKey);
+      
+      // Always send if it's an update with new continued thoughts
+      // Skip only if it's a duplicate initial send (no continued thoughts and already sent)
+      if (isUpdate && continuedThoughts.length === 0) {
+        console.log('Skipping duplicate send for reflection', reflectionNumber);
+        return;
       }
       
       const deviceInfo = getDeviceInfo();
       const sessionId = (prolificPid && prolificPid.length > 0) ? prolificPid : visitorId;
       
+      // Count only user messages (not AI responses) in continued thoughts
+      const userContinuedCount = continuedThoughts.filter(t => !t.startsWith('[AI]:')).length;
+      
       const data = {
-        // IDENTIFIERS
-        visitorId: visitorId,
+        // SESSION INFO (A-C)
+        timestamp: new Date().toISOString(),
         sessionId: sessionId,
+        sessionDuration: Analytics.getSessionDuration(),
         
-        // REFLECTION INFO
-        reflectionNumber: reflectionNumber,
-        totalReflectionsInSession: reflectionsUsed,
-        
-        // SELF-REPORT AT TIME OF THIS REFLECTION
+        // SELF-REPORT DATA (D-H)
         cyclePhase: selfReportAtTime.cyclePhase,
         energyLevel: selfReportAtTime.energy,
         stressLevel: selfReportAtTime.stress,
-        selectedMoods: selfReportAtTime.selectedMoods.join(', '),
-        journalEntry: selfReportAtTime.journal,
+        selectedMoods: Array.isArray(selfReportAtTime.selectedMoods) ? selfReportAtTime.selectedMoods.join(', ') : selfReportAtTime.selectedMoods,
+        journalEntry: selfReportAtTime.journal || '',
         
-        // E2 AT TIME OF THIS REFLECTION
+        // ENGAGEMENT METRICS (I-M)
+        reflectionNumber: reflectionNumber,
+        resonated: selfReportAtTime.resonated || '',
+        regenerateCount: Analytics.regenerateCount || 0,
+        continuedThoughtsCount: userContinuedCount,
+        
+        // E2/HORMONAL CONTEXT (N-P)
         e2Value: selfReportAtTime.e2Value || '',
         e2Trend: selfReportAtTime.e2Trend || '',
         
-        // AI RESPONSE
+        // FULL CONTENT (Q-T)
         aiReflectionText: aiResponse,
-        
-        // USER'S CONTINUED THOUGHTS (for this specific reflection)
         continuedThoughts: continuedThoughts.join(' | '),
-        continuedThoughtsCount: continuedThoughts.length,
         
-        // RESONANCE FOR THIS REFLECTION
-        resonated: selfReportAtTime.resonated || '',
-        
-        // TIMING
-        timestamp: new Date().toISOString(),
-        sessionDuration: Analytics.getSessionDuration(),
-        
-        // TECHNICAL
+        // TECHNICAL (AC-AG)
         deviceType: deviceInfo.deviceType,
         screenWidth: deviceInfo.screenWidth,
         browserType: deviceInfo.browser,
+        isUpdate: isUpdate,
         
-        // FLAG
-        isUpdate: sentReflections.has(reflectionKey),
-        
-        // RAF SPECIFIC
-        userInitiatedCount: reflectionNumber + continuedThoughts.filter(t => !t.startsWith('[AI]')).length,
+        // RAF SPECIFIC (AH-AM)
+        userInitiatedCount: reflectionNumber + userContinuedCount,
         conversationDepth: continuedThoughts.length,
-        reflectionDismissals: Analytics.reflectionDismissals,
-        
-        // SNAPSHOTS FOR THIS REFLECTION
+        reflectionDismissals: Analytics.reflectionDismissals || 0,
         selfReportSnapshot: {
           energy: selfReportAtTime.energy,
           stress: selfReportAtTime.stress,
@@ -853,7 +849,7 @@
         },
         body: JSON.stringify(data)
       }).then(() => {
-        console.log(`Reflection ${reflectionNumber} data sent:`, data);
+        console.log(`Reflection ${reflectionNumber} data sent (update: ${isUpdate}):`, data);
       }).catch(err => {
         console.error('Error sending reflection data:', err);
       });
