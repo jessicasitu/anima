@@ -807,7 +807,8 @@
         
         // ENGAGEMENT METRICS (I-M)
         reflectionNumber: reflectionNumber,
-        resonated: selfReportAtTime.resonated || '',
+        // Only include resonance if this is a resonance update (forceUpdate), otherwise leave blank
+        resonated: forceUpdate ? (selfReportAtTime.resonated || '') : '',
         regenerateCount: Analytics.regenerateCount || 0,
         continuedThoughtsCount: userContinuedCount,
         
