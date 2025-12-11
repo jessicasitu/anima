@@ -1620,19 +1620,21 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
       // Send initial data for this reflection
       sendReflectionData(reflectionsUsed, result.text, reflectionSnapshots[reflectionsUsed]);
       
-      // Render reflection card
-      renderReflectionCard(result, context);
+      // Render reflection card - pass the reflection number so resonance works correctly
+      renderReflectionCard(result, context, reflectionsUsed);
       
       btn.disabled = false;
       btn.textContent = 'Generate New Reflection';
     });
 
     // Render reflection card with continue conversation UI
-    function renderReflectionCard(result, context) {
+    function renderReflectionCard(result, context, reflectionNum) {
+      // Use passed reflectionNum, or fall back to current reflectionsUsed
+      const currentReflectionNum = reflectionNum || reflectionsUsed;
       const threadHTML = ConversationThread.render();
       
       document.getElementById('reflectionContainer').innerHTML = `
-        <div class="reflection-card">
+        <div class="reflection-card" data-reflection-num="${currentReflectionNum}">
           <div class="reflection-header">
             <div>
               <span class="reflection-label">Reflection</span>
@@ -1652,8 +1654,8 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
           
           <div class="reflection-response">
             <div class="response-buttons">
-              <button class="response-btn resonates" onclick="handleResonance(this, true)">👍 This resonates</button>
-              <button class="response-btn doesnt-resonate" onclick="handleResonance(this, false)">👎 Doesn't resonate</button>
+              <button class="response-btn resonates" onclick="handleResonance(this, true, ${currentReflectionNum})">👍 This resonates</button>
+              <button class="response-btn doesnt-resonate" onclick="handleResonance(this, false, ${currentReflectionNum})">👎 Doesn't resonate</button>
             </div>
             
             <!-- CONTINUE CONVERSATION -->
@@ -1661,7 +1663,7 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
               <div class="continue-label">Continue the conversation</div>
               <div class="continue-sublabel">Respond to ANIMA's question, or share whatever comes up. The AI will respond to what you write.</div>
               <textarea id="continueInput" class="continue-input" placeholder="What comes up for you..."></textarea>
-              <button id="continueBtn" class="continue-btn" onclick="continueConversation()">Continue →</button>
+              <button id="continueBtn" class="continue-btn" onclick="continueConversation(${currentReflectionNum})">Continue →</button>
             </div>
           </div>
           
@@ -1677,11 +1679,14 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
     }
 
     // Continue conversation - THE CRITICAL FUNCTION
-    async function continueConversation() {
+    async function continueConversation(reflectionNum) {
       const input = document.getElementById('continueInput');
       const userResponse = input.value.trim();
       
       if (!userResponse) return;
+      
+      // Use passed reflectionNum, or fall back to current reflectionsUsed
+      const targetReflection = reflectionNum || reflectionsUsed;
       
       const btn = document.getElementById('continueBtn');
       btn.disabled = true;
@@ -1690,9 +1695,9 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
       // Add user response to conversation thread FIRST
       ConversationThread.add('user', userResponse);
       
-      // Track this continued thought for the current reflection
-      if (reflectionSnapshots[reflectionsUsed]) {
-        reflectionSnapshots[reflectionsUsed].continuedThoughts.push(userResponse);
+      // Track this continued thought for the target reflection
+      if (reflectionSnapshots[targetReflection]) {
+        reflectionSnapshots[targetReflection].continuedThoughts.push(userResponse);
       }
       
       const context = getCurrentContext();
@@ -1713,22 +1718,22 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
       ConversationThread.add('reflection', result.text, { source: result.source });
       
       // Add the AI follow-up response to continued thoughts too
-      if (reflectionSnapshots[reflectionsUsed]) {
-        reflectionSnapshots[reflectionsUsed].continuedThoughts.push(`[AI]: ${result.text}`);
+      if (reflectionSnapshots[targetReflection]) {
+        reflectionSnapshots[targetReflection].continuedThoughts.push(`[AI]: ${result.text}`);
         
         // Send updated data with continued thoughts
         sendReflectionData(
-          reflectionsUsed, 
-          reflectionSnapshots[reflectionsUsed].aiResponse, 
-          reflectionSnapshots[reflectionsUsed],
-          reflectionSnapshots[reflectionsUsed].continuedThoughts
+          targetReflection, 
+          reflectionSnapshots[targetReflection].aiResponse, 
+          reflectionSnapshots[targetReflection],
+          reflectionSnapshots[targetReflection].continuedThoughts
         );
       }
       
       updateSessionPanel();
       
-      // Re-render the card with updated thread
-      renderReflectionCard(result, context);
+      // Re-render the card with updated thread - pass the same reflection number
+      renderReflectionCard(result, context, targetReflection);
       
       btn.disabled = false;
       btn.textContent = 'Continue →';
@@ -1742,9 +1747,16 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
     };
 
     // Handle resonance feedback
-    function handleResonance(btn, didResonate) {
+    function handleResonance(btn, didResonate, reflectionNum) {
+      console.log('handleResonance called:', { didResonate, reflectionNum, reflectionsUsed });
+      
       btn.parentElement.querySelectorAll('.response-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      
+      // Use passed reflectionNum, or fall back to current reflectionsUsed
+      const targetReflection = reflectionNum || reflectionsUsed;
+      console.log('Target reflection:', targetReflection);
+      console.log('Snapshot exists:', !!reflectionSnapshots[targetReflection]);
       
       // Track the feedback
       if (didResonate) {
@@ -1756,24 +1768,24 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
       resonanceData.history.push({
         timestamp: new Date().toISOString(),
         resonated: didResonate,
-        reflectionIndex: ConversationThread.getHistory().filter(e => e.type === 'reflection').length
+        reflectionIndex: targetReflection
       });
       
       // Update the reflection snapshot with resonance
-      if (reflectionSnapshots[reflectionsUsed]) {
-        reflectionSnapshots[reflectionsUsed].resonated = didResonate ? 'yes' : 'no';
+      if (reflectionSnapshots[targetReflection]) {
+        reflectionSnapshots[targetReflection].resonated = didResonate ? 'yes' : 'no';
         
         // Send updated data with resonance (forceUpdate = true to ensure it sends)
         sendReflectionData(
-          reflectionsUsed, 
-          reflectionSnapshots[reflectionsUsed].aiResponse, 
-          reflectionSnapshots[reflectionsUsed],
-          reflectionSnapshots[reflectionsUsed].continuedThoughts,
+          targetReflection, 
+          reflectionSnapshots[targetReflection].aiResponse, 
+          reflectionSnapshots[targetReflection],
+          reflectionSnapshots[targetReflection].continuedThoughts,
           true  // forceUpdate - always send resonance updates
         );
       }
       
-      console.log('Resonance tracked:', resonanceData);
+      console.log('Resonance tracked for reflection', targetReflection, ':', resonanceData);
       
       // If doesn't resonate and still have reflections, offer to regenerate
       if (!didResonate && reflectionsUsed < MAX_REFLECTIONS) {
