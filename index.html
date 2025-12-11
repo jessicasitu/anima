@@ -825,7 +825,21 @@
         browserType: deviceInfo.browser,
         
         // FLAG
-        isUpdate: sentReflections.has(reflectionKey)
+        isUpdate: sentReflections.has(reflectionKey),
+        
+        // RAF SPECIFIC
+        userInitiatedCount: reflectionNumber + continuedThoughts.filter(t => !t.startsWith('[AI]')).length,
+        conversationDepth: continuedThoughts.length,
+        reflectionDismissals: Analytics.reflectionDismissals,
+        
+        // SNAPSHOTS FOR THIS REFLECTION
+        selfReportSnapshot: {
+          energy: selfReportAtTime.energy,
+          stress: selfReportAtTime.stress,
+          moods: selfReportAtTime.selectedMoods
+        },
+        cyclePhaseAtTime: selfReportAtTime.cyclePhase,
+        e2AtTime: selfReportAtTime.e2Value
       };
       
       sentReflections.add(reflectionKey);
