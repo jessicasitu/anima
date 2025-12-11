@@ -634,6 +634,17 @@
     // ============================================
     const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyRbcJAbOGfkOBTJybhJWWFUXgdsNUsAf5h2p53TQMY96aSLRKqpB0j5_YPjtQe_lwBzg/exec';
     
+    // Generate unique visitor ID for THIS session
+    function generateVisitorId() {
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substr(2, 6).toUpperCase();
+      return `ANIMA_${timestamp}_${random}`;
+    }
+    
+    // Always generate a NEW ID for each page load (each session)
+    const visitorId = generateVisitorId();
+    console.log('Session ID:', visitorId);
+    
     // Comprehensive analytics tracker
     const Analytics = {
       sessionStart: Date.now(),
@@ -647,6 +658,12 @@
       regenerateCount: 0,
       reflectionDismissals: 0,
       lastSelfReportState: null,
+      dataSubmitted: false,
+      
+      // Track ALL self-reports throughout session
+      selfReportHistory: [],
+      cyclePhaseHistory: [],
+      e2History: [],
       
       trackFirstReflection() {
         if (!this.firstReflectionTime) {
@@ -660,10 +677,37 @@
           this.e2ValueFirst = value;
         }
         this.e2ValueLast = value;
+        
+        // Log significant E2 changes
+        const lastLogged = this.e2History.length > 0 ? this.e2History[this.e2History.length - 1].value : null;
+        if (lastLogged === null || Math.abs(value - lastLogged) >= 5) {
+          this.e2History.push({
+            timestamp: new Date().toISOString(),
+            value: value.toFixed(0)
+          });
+        }
       },
       
-      trackCyclePhaseChange() {
+      trackCyclePhaseChange(phase) {
         this.cyclePhaseChanges++;
+        this.cyclePhaseHistory.push({
+          timestamp: new Date().toISOString(),
+          phase: phase
+        });
+      },
+      
+      // Capture full self-report snapshot before each reflection
+      captureSelfReport(selfReport, cyclePhase, e2Value, reflectionIndex) {
+        this.selfReportHistory.push({
+          timestamp: new Date().toISOString(),
+          reflectionIndex: reflectionIndex,
+          cyclePhase: cyclePhase,
+          e2Value: e2Value ? e2Value.toFixed(0) : '',
+          energy: selfReport.energy,
+          stress: selfReport.stress,
+          selectedMoods: [...selfReport.selectedMoods],
+          journal: selfReport.journal
+        });
       },
       
       trackSelfReportChange(newState) {
@@ -723,92 +767,6 @@
       
       return { deviceType, browser, screenWidth: window.innerWidth };
     }
-    
-    // Send data to Google Sheets
-    async function sendToGoogleSheets(completed = false, exitThoughts = '') {
-      const deviceInfo = getDeviceInfo();
-      const selfReport = getCurrentSelfReport();
-      const conversationHistory = ConversationThread.getHistory();
-      
-      const data = {
-        // SESSION INFO
-        prolificPid: prolificPid || '',
-        sessionDuration: Analytics.getSessionDuration(),
-        
-        // SELF-REPORT DATA
-        cyclePhase: currentCyclePhase,
-        energyLevel: selfReport.energy,
-        stressLevel: selfReport.stress,
-        selectedMoods: selfReport.selectedMoods.join(', '),
-        journalEntry: selfReport.journal,
-        
-        // ENGAGEMENT METRICS
-        reflectionsGenerated: reflectionsUsed,
-        resonatesCount: resonanceData.resonates,
-        doesntResonateCount: resonanceData.doesntResonate,
-        regenerateCount: Analytics.regenerateCount,
-        conversationContinues: conversationHistory.filter(e => e.type === 'user').length,
-        
-        // E2/HORMONAL CONTEXT
-        e2ValueFirst: Analytics.e2ValueFirst ? Analytics.e2ValueFirst.toFixed(0) : '',
-        e2ValueLast: Analytics.e2ValueLast ? Analytics.e2ValueLast.toFixed(0) : '',
-        e2Trend: currentFeatures ? currentFeatures.trend : '',
-        
-        // FULL CONTENT
-        allReflectionTexts: conversationHistory.filter(e => e.type === 'reflection').map(e => e.content),
-        allUserResponses: conversationHistory.filter(e => e.type === 'user').map(e => e.content),
-        resonanceHistory: resonanceData.history,
-        fullConversationThread: conversationHistory,
-        
-        // BEHAVIORAL TIMING
-        timeToFirstReflection: Analytics.getTimeToFirstReflection(),
-        avgTimeBetweenReflections: Analytics.getAvgTimeBetweenReflections(),
-        timeSpentReading: '', // Would need more complex tracking
-        cyclePhaseChanges: Analytics.cyclePhaseChanges,
-        selfReportChanges: Analytics.selfReportChanges,
-        
-        // QUALITATIVE DEPTH
-        journalWordCount: selfReport.journal ? selfReport.journal.split(/\s+/).filter(w => w).length : 0,
-        userResponseWordCounts: conversationHistory.filter(e => e.type === 'user').map(e => e.content.split(/\s+/).filter(w => w).length),
-        exitThoughts: exitThoughts,
-        
-        // TECHNICAL/CONTEXT
-        deviceType: deviceInfo.deviceType,
-        screenWidth: deviceInfo.screenWidth,
-        browserType: deviceInfo.browser,
-        errorsEncountered: Analytics.errorsEncountered,
-        completedSession: completed,
-        
-        // RAF-SPECIFIC
-        userInitiatedCount: reflectionsUsed + conversationHistory.filter(e => e.type === 'user').length,
-        conversationDepth: Math.max(...conversationHistory.reduce((acc, e, i) => {
-          if (e.type === 'reflection') acc.push(conversationHistory.slice(0, i+1).filter(x => x.type === 'user').length);
-          return acc;
-        }, [0])),
-        reflectionDismissals: Analytics.reflectionDismissals
-      };
-      
-      try {
-        // Use fetch with no-cors and form data approach for Google Apps Script
-        const formData = new FormData();
-        formData.append('data', JSON.stringify(data));
-        
-        await fetch(GOOGLE_SHEETS_URL, {
-          method: 'POST',
-          body: JSON.stringify(data)
-        });
-        console.log('Data sent to Google Sheets');
-      } catch (error) {
-        console.error('Failed to send to Google Sheets:', error);
-        // Try sendBeacon as fallback
-        try {
-          navigator.sendBeacon(GOOGLE_SHEETS_URL, JSON.stringify(data));
-          console.log('Data sent via sendBeacon fallback');
-        } catch (e2) {
-          console.error('sendBeacon also failed:', e2);
-        }
-      }
-    }
 
     // ============================================
     // QUALTRICS / PROLIFIC INTEGRATION
@@ -822,15 +780,100 @@
       completeBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         
-        // Send data to Google Sheets before redirecting
-        await sendToGoogleSheets(true, '');
-        
-        // Redirect to Qualtrics
-        if (prolificPid) {
-          window.location.href = `${postSurveyBase}?PROLIFIC_PID=${encodeURIComponent(prolificPid)}`;
-        } else {
-          window.location.href = postSurveyBase;
+        // Prevent duplicate submissions
+        if (Analytics.dataSubmitted) {
+          // Already submitted, just redirect
+          if (prolificPid) {
+            window.location.href = `${postSurveyBase}?PROLIFIC_PID=${encodeURIComponent(prolificPid)}`;
+          } else {
+            window.location.href = postSurveyBase;
+          }
+          return;
         }
+        Analytics.dataSubmitted = true;
+        
+        // Collect all data
+        const deviceInfo = getDeviceInfo();
+        const selfReport = getCurrentSelfReport();
+        const conversationHistory = ConversationThread.getHistory();
+        
+        const data = {
+          // SESSION INFO - ID will be generated by Google Apps Script
+          visitorId: visitorId,
+          prolificPid: (prolificPid && prolificPid.length > 0) ? prolificPid : visitorId,
+          sessionDuration: Analytics.getSessionDuration(),
+          
+          // SELF-REPORT DATA (final state)
+          cyclePhase: currentCyclePhase,
+          energyLevel: selfReport.energy,
+          stressLevel: selfReport.stress,
+          selectedMoods: selfReport.selectedMoods.join(', '),
+          journalEntry: selfReport.journal,
+          
+          // ENGAGEMENT METRICS
+          reflectionsGenerated: reflectionsUsed,
+          resonatesCount: resonanceData.resonates,
+          doesntResonateCount: resonanceData.doesntResonate,
+          regenerateCount: Analytics.regenerateCount,
+          conversationContinues: conversationHistory.filter(e => e.type === 'user').length,
+          
+          // E2/HORMONAL CONTEXT
+          e2ValueFirst: Analytics.e2ValueFirst ? Analytics.e2ValueFirst.toFixed(0) : '',
+          e2ValueLast: Analytics.e2ValueLast ? Analytics.e2ValueLast.toFixed(0) : '',
+          e2Trend: currentFeatures ? currentFeatures.trend : '',
+          
+          // FULL CONTENT - ALL reflections and responses
+          allReflectionTexts: conversationHistory.filter(e => e.type === 'reflection').map(e => e.content),
+          allUserResponses: conversationHistory.filter(e => e.type === 'user').map(e => e.content),
+          resonanceHistory: resonanceData.history,
+          fullConversationThread: conversationHistory,
+          
+          // BEHAVIORAL TIMING
+          timeToFirstReflection: Analytics.getTimeToFirstReflection(),
+          avgTimeBetweenReflections: Analytics.getAvgTimeBetweenReflections(),
+          timeSpentReading: '',
+          cyclePhaseChanges: Analytics.cyclePhaseChanges,
+          selfReportChanges: Analytics.selfReportChanges,
+          
+          // QUALITATIVE DEPTH
+          journalWordCount: selfReport.journal ? selfReport.journal.split(/\s+/).filter(w => w).length : 0,
+          userResponseWordCounts: conversationHistory.filter(e => e.type === 'user').map(e => e.content.split(/\s+/).filter(w => w).length),
+          exitThoughts: '',
+          
+          // TECHNICAL/CONTEXT
+          deviceType: deviceInfo.deviceType,
+          screenWidth: deviceInfo.screenWidth,
+          browserType: deviceInfo.browser,
+          errorsEncountered: Analytics.errorsEncountered,
+          completedSession: true,
+          
+          // RAF-SPECIFIC
+          userInitiatedCount: reflectionsUsed + conversationHistory.filter(e => e.type === 'user').length,
+          conversationDepth: Math.max(0, ...conversationHistory.reduce((acc, e, i) => {
+            if (e.type === 'reflection') acc.push(conversationHistory.slice(0, i+1).filter(x => x.type === 'user').length);
+            return acc;
+          }, [0])),
+          reflectionDismissals: Analytics.reflectionDismissals,
+          
+          // HISTORY - all self-reports throughout session
+          selfReportHistory: Analytics.selfReportHistory,
+          cyclePhaseHistory: Analytics.cyclePhaseHistory,
+          e2History: Analytics.e2History
+        };
+        
+        // Use sendBeacon with Blob for reliable delivery
+        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+        const sent = navigator.sendBeacon(GOOGLE_SHEETS_URL, blob);
+        console.log('Data sent via sendBeacon:', sent, data);
+        
+        // Small delay to ensure beacon is sent, then redirect
+        setTimeout(() => {
+          if (prolificPid) {
+            window.location.href = `${postSurveyBase}?PROLIFIC_PID=${encodeURIComponent(prolificPid)}`;
+          } else {
+            window.location.href = postSurveyBase;
+          }
+        }, 300);
       });
     }
 
@@ -1169,6 +1212,7 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
         };
       } catch (error) {
         console.error('AI generation failed:', error);
+        Analytics.trackError(error);
         return null;
       }
     }
@@ -1248,7 +1292,7 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
       
       // Track cycle phase change
       if (previousPhase !== currentCyclePhase) {
-        Analytics.trackCyclePhaseChange();
+        Analytics.trackCyclePhaseChange(currentCyclePhase);
       }
     });
 
@@ -1421,6 +1465,14 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
       
       // Track self-report state for change detection
       Analytics.trackSelfReportChange(context.selfReport);
+      
+      // Capture full self-report snapshot for this reflection
+      Analytics.captureSelfReport(
+        context.selfReport, 
+        context.cyclePhase, 
+        context.features ? context.features.value : null,
+        reflectionsUsed + 1
+      );
       
       let result = await generateAIReflection(context, false, null);
       
@@ -1633,56 +1685,8 @@ Respond with ONLY the reflection text (no headings, no labels, no meta commentar
     E2Simulator.start();
     updateSessionPanel();
     
-    // Send data when user leaves (backup in case they don't click Complete)
-    window.addEventListener('beforeunload', () => {
-      // Use sendBeacon for reliable delivery on page close
-      const deviceInfo = getDeviceInfo();
-      const selfReport = typeof getCurrentSelfReport === 'function' ? getCurrentSelfReport() : { energy: 0, stress: 0, selectedMoods: [], journal: '' };
-      const conversationHistory = ConversationThread.getHistory();
-      
-      const data = {
-        prolificPid: prolificPid || '',
-        sessionDuration: Analytics.getSessionDuration(),
-        cyclePhase: currentCyclePhase,
-        energyLevel: selfReport.energy,
-        stressLevel: selfReport.stress,
-        selectedMoods: selfReport.selectedMoods.join(', '),
-        journalEntry: selfReport.journal,
-        reflectionsGenerated: reflectionsUsed,
-        resonatesCount: resonanceData.resonates,
-        doesntResonateCount: resonanceData.doesntResonate,
-        regenerateCount: Analytics.regenerateCount,
-        conversationContinues: conversationHistory.filter(e => e.type === 'user').length,
-        e2ValueFirst: Analytics.e2ValueFirst ? Analytics.e2ValueFirst.toFixed(0) : '',
-        e2ValueLast: Analytics.e2ValueLast ? Analytics.e2ValueLast.toFixed(0) : '',
-        e2Trend: currentFeatures ? currentFeatures.trend : '',
-        allReflectionTexts: conversationHistory.filter(e => e.type === 'reflection').map(e => e.content),
-        allUserResponses: conversationHistory.filter(e => e.type === 'user').map(e => e.content),
-        resonanceHistory: resonanceData.history,
-        fullConversationThread: conversationHistory,
-        timeToFirstReflection: Analytics.getTimeToFirstReflection(),
-        avgTimeBetweenReflections: Analytics.getAvgTimeBetweenReflections(),
-        timeSpentReading: '',
-        cyclePhaseChanges: Analytics.cyclePhaseChanges,
-        selfReportChanges: Analytics.selfReportChanges,
-        journalWordCount: selfReport.journal ? selfReport.journal.split(/\s+/).filter(w => w).length : 0,
-        userResponseWordCounts: conversationHistory.filter(e => e.type === 'user').map(e => e.content.split(/\s+/).filter(w => w).length),
-        exitThoughts: '',
-        deviceType: deviceInfo.deviceType,
-        screenWidth: deviceInfo.screenWidth,
-        browserType: deviceInfo.browser,
-        errorsEncountered: Analytics.errorsEncountered,
-        completedSession: false, // They didn't click Complete
-        userInitiatedCount: reflectionsUsed + conversationHistory.filter(e => e.type === 'user').length,
-        conversationDepth: Math.max(0, ...conversationHistory.reduce((acc, e, i) => {
-          if (e.type === 'reflection') acc.push(conversationHistory.slice(0, i+1).filter(x => x.type === 'user').length);
-          return acc;
-        }, [0])),
-        reflectionDismissals: Analytics.reflectionDismissals
-      };
-      
-      navigator.sendBeacon(GOOGLE_SHEETS_URL, JSON.stringify(data));
-    });
+    // Data is ONLY sent when user clicks "Complete Session"
+    // No automatic beforeunload sending - this prevents duplicate rows
   </script>
 </body>
 </html>
