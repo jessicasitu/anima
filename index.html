@@ -5,446 +5,583 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ANIMA - AI Reflective Companion</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      /* Light mode base: white - light gray */
-      --bg-primary: #f5f5f5;
-      --bg-secondary: #ebebeb;
-      --bg-card: rgba(255,255,255,0.7);
-      --bg-input: rgba(0,0,0,0.03);
-      
-      /* Text: black for bold, dark gray for regular */
-      --text-primary: #1a1a1a;
-      --text-bold: #000000;
-      --text-secondary: #4a4a4a;
-      --text-muted: #888888;
-      
-      /* Lavender accent for selections */
-      --accent: rgba(140,120,180,0.95);
-      --accent-soft: rgba(140,120,180,0.7);
-      --accent-bg: rgba(160,140,200,0.15);
-      --accent-border: rgba(140,120,180,0.4);
-      
-      /* Borders: subtle grays */
-      --border: rgba(0,0,0,0.08);
-      --border-hover: rgba(0,0,0,0.15);
-      
-      /* Chart color: muted lavender-gray */
-      --chart-line: rgba(120,100,160,0.6);
-      --chart-baseline: rgba(0,0,0,0.1);
-    }
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(160deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-      color: var(--text-primary);
-      min-height: 100vh;
-      line-height: 1.6;
-    }
-    .container { max-width: 540px; margin: 0 auto; padding: 20px; }
-    
-    /* Header */
-    .header { text-align: center; padding: 40px 0 30px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
-    .logo { font-size: 2.8rem; font-weight: 300; letter-spacing: 0.35em; color: var(--text-bold); margin-bottom: 8px; }
-    .subtitle { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; }
-    .research-badge {
-      display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
-      padding: 6px 14px; background: rgba(0,0,0,0.04); border: 1px solid var(--border);
-      border-radius: 20px; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--text-secondary); font-weight: 500;
-    }
-    .badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-    
-    /* Sections */
-    .section { margin-bottom: 28px; padding: 20px; background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); }
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-bold); }
-    .section-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
-    
-    /* Cycle Phase Selector - 2x2 grid */
-    .cycle-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
-    .cycle-option {
-      padding: 14px 10px; background: rgba(255,255,255,0.6); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text-secondary); cursor: pointer;
-      transition: all 0.2s; text-align: center;
-    }
-    .cycle-option:hover { background: rgba(255,255,255,0.9); border-color: var(--border-hover); }
-    .cycle-option.selected { 
-      background: var(--accent-bg); 
-      border-color: var(--accent-border); 
-      color: var(--accent); 
-    }
-    .cycle-option .phase-name { font-weight: 700; font-size: 0.9rem; display: block; margin-bottom: 4px; color: var(--text-bold); }
-    .cycle-option.selected .phase-name { color: var(--accent); }
-    .cycle-option .phase-simple { font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px; font-style: italic; }
-    .cycle-option.selected .phase-simple { color: var(--accent-soft); }
-    .cycle-option .phase-e2 { font-size: 0.68rem; color: var(--text-muted); display: block; }
-    .cycle-option.selected .phase-e2 { color: var(--accent-soft); }
-    
-    /* E2 Context Box */
-    .e2-context {
-      margin-top: 16px; padding: 14px; background: var(--bg-input); border-radius: 10px;
-      font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
-    }
-    .e2-context strong { color: var(--text-bold); font-weight: 700; }
-    
-    /* E2 Panel */
-    .e2-panel { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .e2-metric { text-align: center; }
-    .e2-metric-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
-    .e2-metric-value { font-size: 1.6rem; font-weight: 300; color: var(--text-bold); }
-    .e2-metric-unit { font-size: 0.7rem; color: var(--text-muted); }
-    
-    /* E2 Category badges - neutral grays */
-    .e2-category { 
-      display: inline-block; padding: 3px 10px; 
-      background: rgba(0,0,0,0.05); 
-      border-radius: 12px; font-size: 0.75rem; 
-      color: var(--text-secondary); font-weight: 500;
-    }
-    .e2-category.low { background: rgba(100,120,150,0.12); color: rgba(70,90,120,0.9); }
-    .e2-category.normal { background: rgba(100,100,100,0.1); color: var(--text-secondary); }
-    .e2-category.high { background: rgba(150,120,80,0.12); color: rgba(120,90,50,0.9); }
-    .e2-category.very-high { background: rgba(150,100,100,0.12); color: rgba(130,70,70,0.9); }
-    
-    /* Chart */
-    .chart-container { width: 100%; height: 100px; margin-top: 16px; border-radius: 8px; overflow: hidden; }
-    #e2Chart { width: 100%; height: 100%; }
-    
-    /* Sliders */
-    .slider-group { margin-bottom: 18px; }
-    .slider-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
-    .slider-label { font-size: 0.85rem; color: var(--text-bold); font-weight: 600; }
-    .slider-range { font-size: 0.7rem; color: var(--text-muted); }
-    input[type="range"] { 
-      width: 100%; height: 4px; -webkit-appearance: none; 
-      background: rgba(0,0,0,0.1); border-radius: 2px; outline: none; 
-    }
-    input[type="range"]::-webkit-slider-thumb { 
-      -webkit-appearance: none; width: 18px; height: 18px; 
-      background: var(--text-secondary); border-radius: 50%; cursor: pointer;
-      transition: background 0.2s;
-    }
-    input[type="range"]::-webkit-slider-thumb:hover {
-      background: var(--accent);
-    }
-    
-    /* Mood chips - with emojis */
-    .chip-label { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; }
-    .mood-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-    .mood-chip { 
-      padding: 8px 16px; background: rgba(255,255,255,0.7); 
-      border: 1px solid var(--border); border-radius: 18px; 
-      font-size: 0.85rem; color: var(--text-secondary); 
-      cursor: pointer; transition: all 0.2s; font-weight: 500;
-    }
-    .mood-chip:hover { background: rgba(255,255,255,0.95); border-color: var(--border-hover); }
-    .mood-chip.selected { 
-      background: var(--accent-bg); 
-      border-color: var(--accent-border); 
-      color: var(--accent); 
-      font-weight: 600;
-    }
-    
-    /* Journal */
-    .journal-header {
-      font-size: 0.85rem; color: var(--text-bold); font-weight: 600; margin-bottom: 6px;
-    }
-    .journal-subheader {
-      font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;
-    }
-    .journal-input { 
-      width: 100%; padding: 14px; background: rgba(255,255,255,0.8); 
-      border: 1px solid var(--border); border-radius: 10px; 
-      color: var(--text-primary); font-size: 0.9rem; font-family: inherit; 
-      resize: vertical; min-height: 90px; 
-    }
-    .journal-input::placeholder { color: var(--text-muted); }
-    .journal-input:focus { outline: none; border-color: var(--accent-border); }
-    
-    /* Buttons */
-    .btn-group { display: flex; gap: 10px; margin-top: 16px; }
-    .btn-primary { 
-      flex: 1; padding: 14px 20px; 
-      background: var(--accent-bg); 
-      border: 1px solid var(--accent-border); 
-      border-radius: 10px; color: var(--accent); 
-      font-size: 0.9rem; font-family: inherit; cursor: pointer; 
-      transition: all 0.2s; font-weight: 600;
-    }
-    .btn-primary:hover:not(:disabled) { 
-      background: rgba(140,120,180,0.22); 
-      border-color: rgba(140,120,180,0.55); 
-    }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-secondary { 
-      padding: 14px 16px; background: rgba(255,255,255,0.6); 
-      border: 1px solid var(--border); border-radius: 10px; 
-      color: var(--text-muted); font-size: 0.8rem; font-family: inherit; 
-      cursor: pointer; transition: all 0.2s; font-weight: 500;
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.9); border-color: var(--border-hover); }
-    
-    /* RAF Link - subtle */
-    .raf-link {
-      background: none; border: none; 
-      color: var(--text-muted); font-size: 0.7rem; 
-      cursor: pointer; font-family: inherit;
-      padding: 4px 0; transition: color 0.2s;
-    }
-    .raf-link:hover { color: var(--accent); }
-    
-    /* Generate Button - full width */
-    .btn-generate {
-      width: 100%; padding: 14px 20px;
-      background: var(--accent-bg);
-      border: 1px solid var(--accent-border);
-      border-radius: 10px; color: var(--accent);
-      font-size: 0.9rem; font-family: inherit; cursor: pointer;
-      transition: all 0.2s; font-weight: 600;
-    }
-    .btn-generate:hover:not(:disabled) {
-      background: rgba(140,120,180,0.22);
-      border-color: rgba(140,120,180,0.55);
-    }
-    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
-    
-    /* Loading animation */
-    .loading { display: inline-flex; gap: 4px; align-items: center; }
-    .loading-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: loadingPulse 1s infinite; }
-    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes loadingPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-    
-    /* Reflection Limit Counter */
-    .reflection-limit {
-      text-align: center; margin-bottom: 10px;
-      font-size: 0.75rem; color: var(--text-muted);
-    }
-    .reflection-limit.warning { color: #c97a00; }
-    .reflection-limit.depleted { color: #b55; }
-    
-    /* Complete Session Button */
-    .complete-session {
-      margin-bottom: 20px; padding: 16px;
-      background: var(--accent-bg); border: 1px solid var(--accent-border);
-      border-radius: 10px; text-align: center;
-    }
-    .complete-message {
-      font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;
-    }
-    .complete-btn {
-      display: inline-block; padding: 12px 24px;
-      background: var(--accent); color: white;
-      border-radius: 8px; font-size: 0.85rem; font-weight: 600;
-      text-decoration: none; transition: all 0.2s;
-    }
-    .complete-btn:hover { background: rgba(140,120,180,1); transform: translateY(-1px); }
-    
-    /* Reflection Reminder */
-    .reflection-reminder {
-      margin-bottom: 24px; padding: 20px;
-      background: rgba(255,255,255,0.6); border: 1px solid var(--border);
-      border-radius: 10px; text-align: center;
-    }
-    .reflection-reminder.hidden {
-      display: none;
-    }
-    .reminder-text {
-      font-size: 0.9rem; color: var(--text-bold); margin-bottom: 6px; font-weight: 600;
-    }
-    .reminder-question {
-      font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 12px;
-    }
-    .reminder-btn {
-      padding: 12px 24px;
-      background: var(--accent-bg); border: 1px solid var(--accent-border);
-      border-radius: 8px; font-size: 0.85rem; font-family: inherit;
-      color: var(--accent); cursor: pointer; transition: all 0.2s;
-      font-weight: 600;
-    }
-    .reminder-btn:hover {
-      background: rgba(140,120,180,0.22);
-      border-color: rgba(140,120,180,0.55);
-      transform: translateY(-1px);
-    }
-    
-    /* Reflection card */
-    .reflection-card { 
-      margin-top: 20px; padding: 20px; 
-      background: rgba(255,255,255,0.7); 
-      border: 1px solid var(--accent-border); 
-      border-radius: 12px; animation: fadeIn 0.4s ease; 
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .reflection-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .reflection-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
-    .reflection-source { 
-      font-size: 0.65rem; padding: 3px 8px; 
-      background: var(--accent-bg); 
-      border-radius: 4px; color: var(--accent); margin-left: 8px; font-weight: 500;
-    }
-    .dismiss-btn { 
-      width: 24px; height: 24px; background: rgba(255,255,255,0.8); 
-      border: 1px solid var(--border); border-radius: 50%; 
-      color: var(--text-muted); cursor: pointer; font-size: 1rem; line-height: 1; 
-    }
-    .dismiss-btn:hover { border-color: var(--border-hover); color: var(--text-secondary); }
-    .reflection-text { font-size: 1rem; line-height: 1.75; color: var(--text-primary); margin-bottom: 16px; }
-    .reflection-meta { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 14px; border-top: 1px solid var(--border); margin-bottom: 12px; }
-    .meta-tag { 
-      font-size: 0.68rem; color: var(--text-muted); 
-      background: rgba(0,0,0,0.04); 
-      padding: 3px 8px; border-radius: 4px; font-weight: 500;
-    }
-    .reflection-disclaimer { font-size: 0.75rem; color: var(--text-muted); font-style: italic; line-height: 1.5; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
-    
-    /* Conversation Thread */
-    .conversation-thread {
-      margin: 16px 0; padding: 12px; background: var(--bg-input);
-      border-radius: 10px; max-height: 300px; overflow-y: auto;
-    }
-    .thread-label {
-      font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--text-muted); font-weight: 600; margin-bottom: 12px;
-    }
-    .thread-entry {
-      padding: 10px 12px; margin-bottom: 8px;
-      background: rgba(255,255,255,0.6); border-radius: 8px;
-      border-left: 3px solid var(--border);
-    }
-    .thread-entry.reflection {
-      border-left-color: var(--accent);
-    }
-    .thread-entry.user {
-      border-left-color: var(--text-muted);
-      background: rgba(140,120,180,0.08);
-    }
-    .thread-entry-meta {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.7rem; color: var(--text-muted); margin-bottom: 6px;
-    }
-    .thread-entry-text {
-      font-size: 0.85rem; line-height: 1.6; color: var(--text-primary);
-    }
-    
-    /* Reflection Response Options */
-    .reflection-response { margin-top: 16px; }
-    .response-buttons { display: flex; gap: 10px; margin-bottom: 14px; }
-    .response-btn {
-      flex: 1; padding: 12px 14px; background: rgba(255,255,255,0.8);
-      border: 1px solid var(--border); border-radius: 10px;
-      font-size: 0.8rem; font-family: inherit; color: var(--text-secondary);
-      cursor: pointer; transition: all 0.2s; font-weight: 500;
-      text-align: center;
-    }
-    .response-btn:hover { background: rgba(255,255,255,1); border-color: var(--border-hover); }
-    .response-btn.active, .response-btn.resonates.active {
-      background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); font-weight: 600;
-    }
-    .response-btn.doesnt-resonate.active {
-      background: rgba(200,100,100,0.1); border-color: rgba(200,100,100,0.4); color: #955; font-weight: 600;
-    }
-    .regenerate-prompt {
-      padding: 12px; margin-top: 12px;
-      background: rgba(200,100,100,0.05); border-radius: 8px;
-      text-align: center;
-    }
-    
-    /* Continue Conversation */
-    .continue-conversation {
-      margin-top: 16px; padding: 16px;
-      background: rgba(255,255,255,0.5); border: 1px solid var(--border);
-      border-radius: 10px;
-    }
-    .continue-label {
-      font-size: 0.8rem; color: var(--text-bold); font-weight: 600; margin-bottom: 4px;
-    }
-    .continue-sublabel {
-      font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;
-    }
-    .continue-input {
-      width: 100%; padding: 12px; min-height: 70px;
-      background: rgba(255,255,255,0.8); border: 1px solid var(--border);
-      border-radius: 8px; font-size: 0.85rem; font-family: inherit;
-      color: var(--text-primary); resize: vertical; margin-bottom: 10px;
-    }
-    .continue-input::placeholder { color: var(--text-muted); }
-    .continue-input:focus { outline: none; border-color: var(--accent-border); }
-    .continue-btn {
-      padding: 10px 20px;
-      background: var(--accent-bg); border: 1px solid var(--accent-border);
-      border-radius: 8px; font-size: 0.85rem; font-family: inherit;
-      color: var(--accent); cursor: pointer; transition: all 0.2s; font-weight: 600;
-    }
-    .continue-btn:hover:not(:disabled) { background: rgba(140,120,180,0.22); }
-    .continue-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    
-    /* Sit with this animation */
-    .reflection-card.sitting { animation: gentleFade 1.5s ease forwards; }
-    @keyframes gentleFade { 
-      0% { opacity: 1; transform: scale(1); } 
-      100% { opacity: 0; transform: scale(0.98); } 
-    }
-    
-    /* Session History */
-    .session-history { margin-bottom: 16px; }
-    .session-history-header {
-      font-size: 0.8rem; color: var(--text-bold); font-weight: 600;
-      margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
-    }
-    .session-count { color: var(--text-muted); font-size: 0.75rem; font-weight: 400; }
-    .session-panel {
-      padding: 16px;
-      background: rgba(255,255,255,0.5); border: 1px solid var(--border);
-      border-radius: 10px; max-height: 400px; overflow-y: auto;
-    }
-    .session-empty { color: var(--text-muted); font-size: 0.8rem; font-style: italic; text-align: center; }
-    .session-list { display: flex; flex-direction: column; gap: 12px; }
-    .session-item {
-      padding: 14px; background: rgba(255,255,255,0.7);
-      border: 1px solid var(--border); border-radius: 8px;
-    }
-    .session-item.user-entry {
-      background: rgba(140,120,180,0.08);
-      border-left: 3px solid var(--accent-soft);
-    }
-    .session-item-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 8px; font-size: 0.7rem; color: var(--text-muted);
-    }
-    .session-item-source {
-      font-size: 0.65rem; padding: 2px 6px;
-      background: var(--accent-bg); border-radius: 4px; color: var(--accent);
-    }
-    .session-item-text { font-size: 0.85rem; line-height: 1.6; color: var(--text-primary); }
-    
-    /* RAF Panel */
-    .raf-panel { 
-      margin-top: 16px; padding: 18px; 
-      background: var(--bg-input); 
-      border-radius: 10px; font-size: 0.82rem; line-height: 1.6; display: none; 
-    }
-    .raf-panel.visible { display: block; animation: fadeIn 0.3s ease; }
-    .raf-panel h4 { color: var(--text-bold); margin-bottom: 10px; font-weight: 700; }
-    .raf-panel p { color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6; }
-    .raf-panel .raf-intro { font-size: 0.88rem; margin-bottom: 16px; }
-    .raf-panel .raf-intro em { color: var(--accent); font-style: italic; }
-    .raf-panel .raf-principle { margin-bottom: 14px; }
-    .raf-panel .raf-principle strong { color: var(--text-bold); font-weight: 700; display: block; margin-bottom: 4px; font-size: 0.85rem; }
-    .raf-panel .raf-principle p { font-size: 0.82rem; margin-bottom: 0; color: var(--text-secondary); }
-    .raf-panel .raf-footer { font-size: 0.8rem; color: var(--text-bold); margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
-    
-    /* Footer */
-    .footer { text-align: center; padding: 30px 20px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
-    .footer p { margin-bottom: 8px; }
-    .footer-credit { font-size: 0.7rem; margin-top: 12px; }
-    
-    /* Error message */
-    .error-message {
-      padding: 12px 16px; margin: 10px 0;
-      background: rgba(200,100,100,0.1); border: 1px solid rgba(200,100,100,0.3);
-      border-radius: 8px; font-size: 0.85rem; color: #955;
-    }
+    /* ============================================
+   ANIMA - COMPLETE UPDATED CSS
+   All changes for chat-style interface
+   ============================================ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Light mode base: white - light gray */
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #ebebeb;
+  --bg-card: rgba(255,255,255,0.7);
+  --bg-input: rgba(0,0,0,0.03);
+  
+  /* Text: black for bold, dark gray for regular */
+  --text-primary: #1a1a1a;
+  --text-bold: #000000;
+  --text-secondary: #4a4a4a;
+  --text-muted: #888888;
+  
+  /* Lavender accent for selections */
+  --accent: rgba(140,120,180,0.95);
+  --accent-soft: rgba(140,120,180,0.7);
+  --accent-bg: rgba(160,140,200,0.15);
+  --accent-border: rgba(140,120,180,0.4);
+  
+  /* Borders: subtle grays */
+  --border: rgba(0,0,0,0.08);
+  --border-hover: rgba(0,0,0,0.15);
+  
+  /* Chart color: muted lavender-gray */
+  --chart-line: rgba(120,100,160,0.6);
+  --chart-baseline: rgba(0,0,0,0.1);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(160deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.container { max-width: 540px; margin: 0 auto; padding: 20px; }
+
+/* Header */
+.header { text-align: center; padding: 40px 0 30px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+.logo { font-size: 2.8rem; font-weight: 300; letter-spacing: 0.35em; color: var(--text-bold); margin-bottom: 8px; }
+.subtitle { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; }
+.research-badge {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
+  padding: 6px 14px; background: rgba(0,0,0,0.04); border: 1px solid var(--border);
+  border-radius: 20px; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--text-secondary); font-weight: 500;
+}
+.badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* Sections */
+.section { margin-bottom: 28px; padding: 20px; background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-bold); }
+.section-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
+
+/* Cycle Phase Selector - 2x2 grid */
+.cycle-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+.cycle-option {
+  padding: 14px 10px; background: rgba(255,255,255,0.6); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text-secondary); cursor: pointer;
+  transition: all 0.2s; text-align: center;
+}
+.cycle-option:hover { background: rgba(255,255,255,0.9); border-color: var(--border-hover); }
+.cycle-option.selected { 
+  background: var(--accent-bg); 
+  border-color: var(--accent-border); 
+  color: var(--accent); 
+}
+.cycle-option .phase-name { font-weight: 700; font-size: 0.9rem; display: block; margin-bottom: 4px; color: var(--text-bold); }
+.cycle-option.selected .phase-name { color: var(--accent); }
+.cycle-option .phase-simple { font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px; font-style: italic; }
+.cycle-option.selected .phase-simple { color: var(--accent-soft); }
+.cycle-option .phase-e2 { font-size: 0.68rem; color: var(--text-muted); display: block; }
+.cycle-option.selected .phase-e2 { color: var(--accent-soft); }
+
+/* E2 Context Box */
+.e2-context {
+  margin-top: 16px; padding: 14px; background: var(--bg-input); border-radius: 10px;
+  font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+}
+.e2-context strong { color: var(--text-bold); font-weight: 700; }
+
+/* E2 Panel */
+.e2-panel { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.e2-metric { text-align: center; }
+.e2-metric-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
+.e2-metric-value { font-size: 1.6rem; font-weight: 300; color: var(--text-bold); }
+.e2-metric-unit { font-size: 0.7rem; color: var(--text-muted); }
+
+/* E2 Category badges - neutral grays */
+.e2-category { 
+  display: inline-block; padding: 3px 10px; 
+  background: rgba(0,0,0,0.05); 
+  border-radius: 12px; font-size: 0.75rem; 
+  color: var(--text-secondary); font-weight: 500;
+}
+.e2-category.low { background: rgba(100,120,150,0.12); color: rgba(70,90,120,0.9); }
+.e2-category.normal { background: rgba(100,100,100,0.1); color: var(--text-secondary); }
+.e2-category.high { background: rgba(150,120,80,0.12); color: rgba(120,90,50,0.9); }
+.e2-category.very-high { background: rgba(150,100,100,0.12); color: rgba(130,70,70,0.9); }
+
+/* Chart */
+.chart-container { width: 100%; height: 100px; margin-top: 16px; border-radius: 8px; overflow: hidden; }
+#e2Chart { width: 100%; height: 100%; }
+
+/* Sliders */
+.slider-group { margin-bottom: 18px; }
+.slider-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.slider-label { font-size: 0.85rem; color: var(--text-bold); font-weight: 600; }
+.slider-range { font-size: 0.7rem; color: var(--text-muted); }
+input[type="range"] { 
+  width: 100%; height: 4px; -webkit-appearance: none; 
+  background: rgba(0,0,0,0.1); border-radius: 2px; outline: none; 
+}
+input[type="range"]::-webkit-slider-thumb { 
+  -webkit-appearance: none; width: 18px; height: 18px; 
+  background: var(--text-secondary); border-radius: 50%; cursor: pointer;
+  transition: background 0.2s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: var(--accent);
+}
+
+/* Mood chips - with emojis */
+.chip-label { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; }
+.mood-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.mood-chip { 
+  padding: 8px 16px; background: rgba(255,255,255,0.7); 
+  border: 1px solid var(--border); border-radius: 18px; 
+  font-size: 0.85rem; color: var(--text-secondary); 
+  cursor: pointer; transition: all 0.2s; font-weight: 500;
+}
+.mood-chip:hover { background: rgba(255,255,255,0.95); border-color: var(--border-hover); }
+.mood-chip.selected { 
+  background: var(--accent-bg); 
+  border-color: var(--accent-border); 
+  color: var(--accent); 
+  font-weight: 600;
+}
+
+/* Journal */
+.journal-header {
+  font-size: 0.85rem; color: var(--text-bold); font-weight: 600; margin-bottom: 6px;
+}
+.journal-subheader {
+  font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;
+}
+.journal-input { 
+  width: 100%; padding: 14px; background: rgba(255,255,255,0.8); 
+  border: 1px solid var(--border); border-radius: 10px; 
+  color: var(--text-primary); font-size: 0.9rem; font-family: inherit; 
+  resize: vertical; min-height: 90px; 
+}
+.journal-input::placeholder { color: var(--text-muted); }
+.journal-input:focus { outline: none; border-color: var(--accent-border); }
+
+/* Buttons */
+.btn-group { display: flex; gap: 10px; margin-top: 16px; }
+.btn-primary { 
+  flex: 1; padding: 14px 20px; 
+  background: var(--accent-bg); 
+  border: 1px solid var(--accent-border); 
+  border-radius: 10px; color: var(--accent); 
+  font-size: 0.9rem; font-family: inherit; cursor: pointer; 
+  transition: all 0.2s; font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) { 
+  background: rgba(140,120,180,0.22); 
+  border-color: rgba(140,120,180,0.55); 
+}
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary { 
+  padding: 14px 16px; background: rgba(255,255,255,0.6); 
+  border: 1px solid var(--border); border-radius: 10px; 
+  color: var(--text-muted); font-size: 0.8rem; font-family: inherit; 
+  cursor: pointer; transition: all 0.2s; font-weight: 500;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.9); border-color: var(--border-hover); }
+
+/* RAF Link - subtle */
+.raf-link {
+  background: none; border: none; 
+  color: var(--text-muted); font-size: 0.7rem; 
+  cursor: pointer; font-family: inherit;
+  padding: 4px 0; transition: color 0.2s;
+}
+.raf-link:hover { color: var(--accent); }
+
+/* Generate Button - full width */
+.btn-generate {
+  width: 100%; padding: 14px 20px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 10px; color: var(--accent);
+  font-size: 0.9rem; font-family: inherit; cursor: pointer;
+  transition: all 0.2s; font-weight: 600;
+}
+.btn-generate:hover:not(:disabled) {
+  background: rgba(140,120,180,0.22);
+  border-color: rgba(140,120,180,0.55);
+}
+.btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Loading animation */
+.loading { display: inline-flex; gap: 4px; align-items: center; }
+.loading-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: loadingPulse 1s infinite; }
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes loadingPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+/* HIDDEN - Reflection Limit Counter */
+.reflection-limit {
+  display: none !important;
+}
+
+/* NEW - Limit Modal */
+.limit-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.limit-modal.visible {
+  display: flex;
+}
+
+.limit-modal-content {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.limit-modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-bold);
+  margin-bottom: 12px;
+}
+
+.limit-modal-message {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.limit-modal-btn {
+  padding: 12px 24px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.limit-modal-btn:hover {
+  background: rgba(140, 120, 180, 1);
+  transform: translateY(-1px);
+}
+
+/* Complete Session Button */
+.complete-session {
+  margin-bottom: 20px; padding: 16px;
+  background: var(--accent-bg); border: 1px solid var(--accent-border);
+  border-radius: 10px; text-align: center;
+}
+.complete-message {
+  font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;
+}
+.complete-btn {
+  display: inline-block; padding: 12px 24px;
+  background: var(--accent); color: white;
+  border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+  text-decoration: none; transition: all 0.2s;
+}
+.complete-btn:hover { background: rgba(140,120,180,1); transform: translateY(-1px); }
+
+/* UPDATED - Chat-style conversation thread */
+#conversationThread {
+  margin-top: 20px;
+}
+
+.reflection-bubble {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn { 
+  from { opacity: 0; transform: translateY(8px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
+
+.reflection-text {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.reflection-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.meta-tag {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.04);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* NEW - Inline feedback buttons */
+.reflection-feedback {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.feedback-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+.feedback-btn {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+}
+
+.feedback-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: var(--border-hover);
+}
+
+.feedback-btn.active.thumbs-up {
+  background: rgba(100, 200, 100, 0.1);
+  border-color: rgba(100, 200, 100, 0.4);
+  color: #4a4;
+  font-weight: 600;
+}
+
+.feedback-btn.active.thumbs-down {
+  background: rgba(200, 100, 100, 0.1);
+  border-color: rgba(200, 100, 100, 0.4);
+  color: #955;
+  font-weight: 600;
+}
+
+/* NEW - Chat-style response input */
+.chat-response {
+  margin-top: 0;
+}
+
+.chat-input-container {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  resize: none;
+  min-height: 42px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.chat-input::placeholder {
+  color: var(--text-muted);
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: var(--accent-border);
+}
+
+.chat-send-btn {
+  padding: 10px 16px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  height: 42px;
+  font-family: inherit;
+}
+
+.chat-send-btn:hover:not(:disabled) {
+  background: rgba(140, 120, 180, 0.22);
+  border-color: rgba(140, 120, 180, 0.55);
+}
+
+.chat-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* UPDATED - Collapsible Session History */
+.session-history {
+  margin-bottom: 16px;
+}
+
+.session-history-header {
+  font-size: 0.8rem;
+  color: var(--text-bold);
+  font-weight: 600;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.session-history-header:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.session-count {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.session-toggle {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.session-panel {
+  display: none;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: -10px;
+}
+
+.session-panel.visible {
+  display: block;
+}
+
+.session-empty {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-style: italic;
+  text-align: center;
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.session-item {
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.session-item.user-entry {
+  background: rgba(140, 120, 180, 0.08);
+  border-left: 3px solid var(--accent-soft);
+}
+
+.session-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.session-item-source {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  background: var(--accent-bg);
+  border-radius: 4px;
+  color: var(--accent);
+}
+
+.session-item-text {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+/* RAF Panel */
+.raf-panel { 
+  margin-top: 16px; padding: 18px; 
+  background: var(--bg-input); 
+  border-radius: 10px; font-size: 0.82rem; line-height: 1.6; display: none; 
+}
+.raf-panel.visible { display: block; animation: fadeIn 0.3s ease; }
+.raf-panel h4 { color: var(--text-bold); margin-bottom: 10px; font-weight: 700; }
+.raf-panel p { color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6; }
+.raf-panel .raf-intro { font-size: 0.88rem; margin-bottom: 16px; }
+.raf-panel .raf-intro em { color: var(--accent); font-style: italic; }
+.raf-panel .raf-principle { margin-bottom: 14px; }
+.raf-panel .raf-principle strong { color: var(--text-bold); font-weight: 700; display: block; margin-bottom: 4px; font-size: 0.85rem; }
+.raf-panel .raf-principle p { font-size: 0.82rem; margin-bottom: 0; color: var(--text-secondary); }
+.raf-panel .raf-footer { font-size: 0.8rem; color: var(--text-bold); margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+/* Footer */
+.footer { text-align: center; padding: 30px 20px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
+.footer p { margin-bottom: 8px; }
+.footer-credit { font-size: 0.7rem; margin-top: 12px; }
+
+/* Error message */
+.error-message {
+  padding: 12px 16px; margin: 10px 0;
+  background: rgba(200, 100, 100, 0.1); border: 1px solid rgba(200, 100, 100, 0.3);
+  border-radius: 8px; font-size: 0.85rem; color: #955;
+}
   </style>
 </head>
 <body>
@@ -549,54 +686,50 @@
       <textarea id="journalInput" class="journal-input" placeholder=""></textarea>
     </section>
 
-    <!-- Let's Reflect -->
-    <section class="section" id="ai-reflection">
-      <div class="section-header">
-        <h2 class="section-title">Let's Reflect</h2>
-        <button id="rafInfoBtn" class="raf-link">About RAF ›</button>
-      </div>
-      <p class="section-desc">ANIMA generates personalized reflections based on your E2 rhythm and self-report. All reflections follow the Reflective Agency Framework—no diagnoses, no prescriptions.</p>
-      
-      <div id="rafPanel" class="raf-panel">
-        <h4>Reflective Agency Framework (RAF)</h4>
-        <p class="raf-intro">ANIMA is built on the Reflective Agency Framework, designed to support self-understanding without undermining personal autonomy. The framework ensures AI-mediated reflection remains <em>yours</em>—not something imposed on you.</p>
-        
-        <div class="raf-principle">
-          <strong>1. Internal Origination</strong>
-          <p>Reflections only appear when <em>you</em> request them. ANIMA never pushes insights, notifications, or unsolicited advice. You remain the author of your own reflection process.</p>
-        </div>
-        
-        <div class="raf-principle">
-          <strong>2. Calibrated Responsiveness</strong>
-          <p>The AI adapts its tone and content to your current state—your E2 level, energy, sensitivity, and what you've shared. Low energy gets gentleness; high sensitivity gets care. The response meets you where you are.</p>
-        </div>
-        
-        <div class="raf-principle">
-          <strong>3. Reflective Ambiguity</strong>
-          <p>ANIMA offers possibilities, not conclusions. Language like "might," "could," and "sometimes" keeps interpretations open. The AI ends with questions, not answers—inviting your own meaning-making rather than providing diagnoses.</p>
-        </div>
-        
-        <div class="raf-principle">
-          <strong>4. Transparency of Mediation</strong>
-          <p>You always see what data informed the reflection—your E2 reading, trend, cycle phase, and self-report. Nothing is hidden. You understand <em>why</em> the AI responded as it did.</p>
-        </div>
-        
-        <div class="raf-principle">
-          <strong>5. Self-Continuity</strong>
-          <p>Reflections acknowledge your hormonal context without <em>reducing</em> you to it. You're a whole person with history, complexity, and agency—not just a data point. ANIMA supports your ongoing self-narrative.</p>
-        </div>
-        
-        <p class="raf-footer">The goal is <strong>self-understanding</strong>, not self-management. Reflection over fixing. Curiosity over judgment.</p>
-      </div>
-      
-      <div class="reflection-limit">
-        <span id="reflectionCounter">5 reflections remaining</span>
-      </div>
-      
-      <button id="generateBtn" class="btn-generate">Generate Reflection</button>
-      
-      <div id="reflectionContainer"></div>
-    </section>
+    <!-- AI Reflection Section -->
+<section class="section" id="ai-reflection">
+  <div class="section-header">
+    <h2 class="section-title">Let's Reflect</h2>
+    <button id="rafInfoBtn" class="raf-link">About RAF ›</button>
+  </div>
+  <p class="section-desc">ANIMA generates personalized reflections based on your cycle and self-report. All reflections follow the Reflective Agency Framework—no diagnoses, no prescriptions.</p>
+  
+  <div id="rafPanel" class="raf-panel">
+    <!-- RAF content stays the same -->
+  </div>
+  
+  <!-- HIDDEN reflection counter -->
+  <div class="reflection-limit" style="display: none;">
+    <span id="reflectionCounter">5 reflections remaining</span>
+  </div>
+  
+  <button id="generateBtn" class="btn-generate">Generate Reflection</button>
+  
+  <!-- Conversation thread (replaces old reflection-card) -->
+  <div id="conversationThread"></div>
+</section>
+
+<!-- COLLAPSIBLE Session History -->
+<section class="section session-history">
+  <div class="session-history-header" id="sessionToggle">
+    <span>My Session <span class="session-count" id="sessionCount">(0)</span></span>
+    <span class="session-toggle">▼ Show</span>
+  </div>
+  <div class="session-panel" id="sessionPanel">
+    <div id="sessionList" class="session-list">
+      <p class="session-empty">No reflections yet. Generate one to get started.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Limit Reached Modal -->
+<div id="limitModal" class="limit-modal">
+  <div class="limit-modal-content">
+    <h3 class="limit-modal-title">You've used all your reflections</h3>
+    <p class="limit-modal-message">We hope ANIMA was helpful! We're working to make this more accessible soon. For now, please complete the post-survey to finish the study.</p>
+    <button class="limit-modal-btn" onclick="closeLimitModal()">Got it</button>
+  </div>
+</div>
 
     <!-- Session History -->
     <section class="section session-history">
@@ -633,7 +766,7 @@
     // GOOGLE SHEETS DATA COLLECTION
     // ============================================
     const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyRbcJAbOGfkOBTJybhJWWFUXgdsNUsAf5h2p53TQMY96aSLRKqpB0j5_YPjtQe_lwBzg/exec';
-    
+    let currentReflectionId = 0;
     // Generate unique visitor ID for THIS session
     function generateVisitorId() {
       const timestamp = Date.now();
@@ -1193,8 +1326,6 @@
     // ============================================
     // AI REFLECTION WITH FULL CONVERSATION CONTEXT
     // ============================================
-    // ============================================
-
 
 async function generateAIReflection(context, isFollowUp = false, userJustSaid = null) {
   const { features, selfReport, cyclePhase } = context;
@@ -1230,19 +1361,19 @@ You sound like a wise, warm friend who really gets it. You're:
 
 THE CRUCIAL BALANCE - NON-DIAGNOSTIC CONFIDENCE:
 You can be CONFIDENT about what they shared:
-"You wrote that everything is annoying you"
-"You've mentioned feeling restless twice now"
-"You described feeling both tired and wired"
+✅ "You wrote that everything is annoying you"
+✅ "You've mentioned feeling restless twice now"
+✅ "You described feeling both tired and wired"
 
 You CANNOT be certain about medical causes:
-NOT: "Your hormones are causing this"
-NOT: "Your body is at its lowest energy point"
-NOT: "That has a physiological basis"
+❌ NOT: "Your hormones are causing this"
+❌ NOT: "Your body is at its lowest energy point"
+❌ NOT: "That has a physiological basis"
 
 Instead, OFFER POSSIBILITIES using language of correlation:
-"There's often a connection between irritability and this phase"
-"Many people notice lower energy during menstruation"
-"That 'tired but wired' feeling is common in the luteal phase"
+✅ "There's often a connection between irritability and this phase"
+✅ "Many people notice lower energy during menstruation"
+✅ "That 'tired but wired' feeling is common in the luteal phase"
 
 REFLECTION, NOT DIAGNOSIS:
 You're helping them SEE their patterns, not telling them what those patterns MEAN medically.
@@ -1257,18 +1388,18 @@ YOU SPEAK TO THEM, NOT ABOUT THEM:
 
 THE LANGUAGE OF POSSIBILITY:
 When connecting experiences to cycles, use:
-"There's often a connection between..."
-"Many people notice..."
-"This phase tends to bring..."
+✅ "There's often a connection between..."
+✅ "Many people notice..."
+✅ "This phase tends to bring..."
 
 When validating, be STRONG:
-"That's real."
-"You're not imagining this."
-"This makes sense."
+✅ "That's real."
+✅ "You're not imagining this."
+✅ "This makes sense."
 
 When suggesting connections, be TENTATIVE:
-"There might be a link..."
-"This could relate to..."
+⚠️ "There might be a link..."
+⚠️ "This could relate to..."
 
 ${isFollowUp ? 
   `FOLLOW-UP RESPONSE:
@@ -1306,7 +1437,6 @@ ${isFollowUp ? '- NO question at the end—validate and affirm' : '- End with ON
 
 CYCLE CONTEXT: ${cycleContext.aiContext}`;
 
-  // Build user prompt
   let userPrompt = `WHERE THEY ARE:
 Cycle phase: ${cyclePhase}
 Hormonal pattern: ${features.trend.toLowerCase()}${features.category !== 'Normal' ? ` (${features.category.toLowerCase()})` : ''}
@@ -1317,10 +1447,11 @@ Energy: ${energyWords[selfReport.energy - 1]}
 Stress: ${stressWords[selfReport.stress - 1]}`;
 
   if (selfReport.journal && selfReport.journal.length > 0) {
-    userPrompt += `\n\nTHEY WROTE:\n"${selfReport.journal}"`;
+    userPrompt += `\n\nTHEY WROTE:\n"${selfReport.journal}"
+
+→ This is valuable. Their written reflection gives you deeper context than mood chips alone. Use their specific words and phrases—this is where the real insight lives.`;
   }
 
-  // Add conversation history if it exists
   if (conversationHistory) {
     userPrompt += `
 
@@ -1329,11 +1460,10 @@ ${conversationHistory}
 --- END CONVERSATION ---`;
   }
 
-  // If this is a follow-up, PROMINENTLY highlight what the user just said
   if (isFollowUp && userJustSaid) {
     userPrompt += `
 
-THE USER JUST RESPONDED WITH:
+⭐ THE USER JUST RESPONDED WITH:
 "${userJustSaid}"
 
 YOUR TASK: Respond directly to what they just shared. Acknowledge their specific words or feelings. Validate their experience. DO NOT ask another question—close with warmth and affirmation.`;
@@ -1348,7 +1478,6 @@ YOUR TASK: Generate a warm, observant reflection (2-4 sentences) that acknowledg
 Remember: you're reflecting and validating, not diagnosing. Respond with ONLY the reflection text (no headings, no labels, no meta commentary).`;
 
   try {
-    // Call Vercel serverless function (API key is hidden on server)
     const response = await fetch('/api/anthropic', {
       method: 'POST',
       headers: { 
@@ -1357,7 +1486,7 @@ Remember: you're reflecting and validating, not diagnosing. Respond with ONLY th
       body: JSON.stringify({
         systemPrompt: systemPrompt,
         userPrompt: userPrompt,
-        maxTokens: 350  // Increased from default for more thoughtful responses
+        maxTokens: 350
       })
     });
 
@@ -1368,13 +1497,11 @@ Remember: you're reflecting and validating, not diagnosing. Respond with ONLY th
     }
 
     const data = await response.json();
-    
-    // The Vercel function returns { reply: "text" }
     const text = data.reply || '';
     
     return {
       text: text || 'Unable to generate reflection.',
-      source: 'ANIMA',  // Changed from 'Claude AI' for branding
+      source: 'ANIMA',
       isAI: true
     };
   } catch (error) {
@@ -1432,13 +1559,193 @@ Remember: you're reflecting and validating, not diagnosing. Respond with ONLY th
       });
       ctx.stroke();
     }
+    // ============================================
+// NEW FUNCTIONS - ADD THESE
+// ============================================
 
+// Close limit modal
+function closeLimitModal() {
+  document.getElementById('limitModal').classList.remove('visible');
+}
+
+// Render chat-style bubble
+function renderChatBubble(result, context, reflectionNum, bubbleId) {
+  const threadContainer = document.getElementById('conversationThread');
+  
+  const bubbleHTML = `
+    <div class="reflection-bubble" data-reflection-num="${reflectionNum}" data-bubble-id="${bubbleId}">
+      <div class="reflection-text">${result.text}</div>
+      
+      <div class="reflection-meta">
+        <span class="meta-tag">E2: ${context.features.value.toFixed(0)} pg/mL</span>
+        <span class="meta-tag">${context.features.category}</span>
+        <span class="meta-tag">${context.features.trend}</span>
+        <span class="meta-tag">Phase: ${context.cyclePhase}</span>
+      </div>
+      
+      <div class="reflection-feedback">
+        <span class="feedback-label">Was this helpful?</span>
+        <button class="feedback-btn thumbs-up" onclick="handleFeedback(${reflectionNum}, true, ${bubbleId})">
+          👍 Yes
+        </button>
+        <button class="feedback-btn thumbs-down" onclick="handleFeedback(${reflectionNum}, false, ${bubbleId})">
+          👎 Not really
+        </button>
+      </div>
+      
+      <div class="chat-response">
+        <div class="chat-input-container">
+          <textarea 
+            class="chat-input" 
+            id="chatInput${bubbleId}"
+            placeholder="Share your thoughts..."
+            rows="1"
+          ></textarea>
+          <button class="chat-send-btn" onclick="sendChatResponse(${reflectionNum}, ${bubbleId})">
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  threadContainer.insertAdjacentHTML('beforeend', bubbleHTML);
+  
+  // Auto-resize textarea
+  const textarea = document.getElementById(`chatInput${bubbleId}`);
+  textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+  });
+  
+  // Scroll to new bubble
+  setTimeout(() => {
+    const bubble = document.querySelector(`[data-bubble-id="${bubbleId}"]`);
+    if (bubble) {
+      bubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, 100);
+}
+
+// Handle feedback (thumbs up/down)
+function handleFeedback(reflectionNum, isPositive, bubbleId) {
+  const bubble = document.querySelector(`[data-bubble-id="${bubbleId}"]`);
+  const buttons = bubble.querySelectorAll('.feedback-btn');
+  
+  buttons.forEach(btn => btn.classList.remove('active'));
+  
+  const clickedBtn = bubble.querySelector(isPositive ? '.thumbs-up' : '.thumbs-down');
+  clickedBtn.classList.add('active');
+  
+  if (isPositive) {
+    resonanceData.resonates++;
+  } else {
+    resonanceData.doesntResonate++;
+  }
+  
+  resonanceData.history.push({
+    timestamp: new Date().toISOString(),
+    resonated: isPositive,
+    reflectionIndex: reflectionNum
+  });
+  
+  if (reflectionSnapshots[reflectionNum]) {
+    reflectionSnapshots[reflectionNum].resonated = isPositive ? 'yes' : 'no';
+    
+    sendReflectionData(
+      reflectionNum, 
+      reflectionSnapshots[reflectionNum].aiResponse, 
+      reflectionSnapshots[reflectionNum],
+      reflectionSnapshots[reflectionNum].continuedThoughts,
+      true
+    );
+  }
+  
+  console.log('Feedback tracked for reflection', reflectionNum, ':', isPositive);
+}
+
+// Send chat response
+async function sendChatResponse(reflectionNum, bubbleId) {
+  const input = document.getElementById(`chatInput${bubbleId}`);
+  const userResponse = input.value.trim();
+  
+  if (!userResponse) return;
+  
+  const sendBtn = input.nextElementSibling;
+  sendBtn.disabled = true;
+  sendBtn.innerHTML = '<span class="loading"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></span>';
+  
+  ConversationThread.add('user', userResponse);
+  
+  if (reflectionSnapshots[reflectionNum]) {
+    reflectionSnapshots[reflectionNum].continuedThoughts.push(userResponse);
+  }
+  
+  const threadContainer = document.getElementById('conversationThread');
+  threadContainer.insertAdjacentHTML('beforeend', `
+    <div class="reflection-bubble" style="background: rgba(140,120,180,0.08); border-left: 3px solid var(--accent);">
+      <div class="reflection-text" style="font-size: 0.9rem;">${userResponse}</div>
+      <div class="reflection-meta">
+        <span class="meta-tag">You</span>
+      </div>
+    </div>
+  `);
+  
+  input.value = '';
+  input.style.height = 'auto';
+  
+  const context = getCurrentContext();
+  
+  let result = await generateAIReflection(context, true, userResponse);
+  
+  if (!result) {
+    result = {
+      text: "Thank you for sharing that. What you're experiencing sounds meaningful.",
+      source: 'Fallback',
+      isAI: false
+    };
+  }
+  
+  ConversationThread.add('reflection', result.text, { source: result.source });
+  
+  if (reflectionSnapshots[reflectionNum]) {
+    reflectionSnapshots[reflectionNum].continuedThoughts.push(`[AI]: ${result.text}`);
+    
+    sendReflectionData(
+      reflectionNum, 
+      reflectionSnapshots[reflectionNum].aiResponse, 
+      reflectionSnapshots[reflectionNum],
+      reflectionSnapshots[reflectionNum].continuedThoughts
+    );
+  }
+  
+  updateSessionPanel();
+  
+  currentReflectionId++;
+  renderChatBubble(result, context, reflectionNum, currentReflectionId);
+  
+  sendBtn.disabled = false;
+  sendBtn.textContent = 'Send';
+}
     // ============================================
     // UI STATE & EVENT HANDLERS
     // ============================================
     let currentFeatures = null;
     let selectedMoods = [];
 
+    // Collapsible session history
+    document.getElementById('sessionToggle').addEventListener('click', () => {
+      const panel = document.getElementById('sessionPanel');
+      const toggle = document.querySelector('.session-toggle');
+      
+      if (panel.classList.contains('visible')) {
+        panel.classList.remove('visible');
+        toggle.textContent = '▼ Show';
+      } else {
+        panel.classList.add('visible');
+        toggle.textContent = '▲ Hide';
+      }
+    });
     // Cycle phase selection
     document.getElementById('cycleOptions').addEventListener('click', (e) => {
       const option = e.target.closest('.cycle-option');
@@ -1613,85 +1920,90 @@ Remember: you're reflecting and validating, not diagnosing. Respond with ONLY th
     }
 
     // Generate reflection
-    document.getElementById('generateBtn').addEventListener('click', async () => {
-      if (!currentFeatures) return;
-      if (reflectionsUsed >= MAX_REFLECTIONS) return;
-      
-      const btn = document.getElementById('generateBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="loading"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></span>';
-      
-      const context = getCurrentContext();
-      
-      // Check if context changed from previous reflection - if so, start fresh
-      if (ConversationThread.hasContextChanged(context) && ConversationThread.getHistory().length > 0) {
-        console.log('Context changed - starting fresh conversation thread');
-        ConversationThread.clear();
-      }
-      
-      // Track self-report state for change detection
-      Analytics.trackSelfReportChange(context.selfReport);
-      
-      // Capture full self-report snapshot for this reflection
-      Analytics.captureSelfReport(
-        context.selfReport, 
-        context.cyclePhase, 
-        context.features ? context.features.value : null,
-        reflectionsUsed + 1
-      );
-      
-      let result = await generateAIReflection(context, false, null);
-      
-      if (!result) {
-        // Track error
-        Analytics.trackError('AI generation failed');
-        
-        // Show error but don't break
-        document.getElementById('reflectionContainer').innerHTML = `
-          <div class="error-message">
-            Unable to connect to AI. Please check your connection and try again.
-          </div>
-        `;
-        btn.disabled = false;
-        btn.textContent = 'Try Again';
-        return;
-      }
-      
-      // Track successful reflection
-      Analytics.trackFirstReflection();
-      
-      // Add to conversation thread and save context
-      ConversationThread.add('reflection', result.text, { source: result.source });
-      ConversationThread.setLastContext(context);
-      
-      updateSessionPanel();
-      reflectionsUsed++;
-      updateReflectionCounter();
-      
-      // Store snapshot for this reflection (for later updates with continued thoughts)
-      reflectionSnapshots[reflectionsUsed] = {
-        cyclePhase: context.cyclePhase,
-        energy: context.selfReport.energy,
-        stress: context.selfReport.stress,
-        selectedMoods: [...context.selfReport.selectedMoods],
-        journal: context.selfReport.journal,
-        e2Value: context.features ? context.features.value.toFixed(0) : '',
-        e2Trend: context.features ? context.features.trend : '',
-        aiResponse: result.text,
-        continuedThoughts: [],
-        resonated: ''
-      };
-      
-      // Send initial data for this reflection
-      sendReflectionData(reflectionsUsed, result.text, reflectionSnapshots[reflectionsUsed]);
-      
-      // Render reflection card - pass the reflection number so resonance works correctly
-      renderReflectionCard(result, context, reflectionsUsed);
-      
-      btn.disabled = false;
-      btn.textContent = 'Generate New Reflection';
-    });
+    // ============================================
 
+  document.getElementById('generateBtn').addEventListener('click', async () => {
+    if (!currentFeatures) return;
+    
+  // Check limit and show modal instead
+  if (reflectionsUsed >= MAX_REFLECTIONS) {
+    document.getElementById('limitModal').classList.add('visible');
+    return;
+  }
+  
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></span>';
+  
+  const context = getCurrentContext();
+  
+  if (ConversationThread.hasContextChanged(context) && ConversationThread.getHistory().length > 0) {
+    console.log('Context changed - starting fresh conversation thread');
+    ConversationThread.clear();
+  }
+  
+  Analytics.trackSelfReportChange(context.selfReport);
+  Analytics.captureSelfReport(
+    context.selfReport, 
+    context.cyclePhase, 
+    context.features ? context.features.value : null,
+    reflectionsUsed + 1
+  );
+  
+  let result = await generateAIReflection(context, false, null);
+  
+  if (!result) {
+    Analytics.trackError('AI generation failed');
+    const threadContainer = document.getElementById('conversationThread');
+    threadContainer.innerHTML += `
+      <div class="error-message">
+        Unable to connect to AI. Please check your connection and try again.
+      </div>
+    `;
+    btn.disabled = false;
+    btn.textContent = 'Try Again';
+    return;
+  }
+  
+  Analytics.trackFirstReflection();
+  
+  ConversationThread.add('reflection', result.text, { source: result.source });
+  ConversationThread.setLastContext(context);
+  
+  updateSessionPanel();
+  reflectionsUsed++;
+  currentReflectionId++;
+  
+  reflectionSnapshots[reflectionsUsed] = {
+    cyclePhase: context.cyclePhase,
+    energy: context.selfReport.energy,
+    stress: context.selfReport.stress,
+    selectedMoods: [...context.selfReport.selectedMoods],
+    journal: context.selfReport.journal,
+    e2Value: context.features ? context.features.value.toFixed(0) : '',
+    e2Trend: context.features ? context.features.trend : '',
+    aiResponse: result.text,
+    continuedThoughts: [],
+    resonated: ''
+  };
+  
+  sendReflectionData(reflectionsUsed, result.text, reflectionSnapshots[reflectionsUsed]);
+  
+  // Render in chat style
+  renderChatBubble(result, context, reflectionsUsed, currentReflectionId);
+  
+  // Check if limit reached
+  if (reflectionsUsed >= MAX_REFLECTIONS) {
+    btn.disabled = true;
+    btn.textContent = 'Limit Reached';
+    setTimeout(() => {
+      document.getElementById('limitModal').classList.add('visible');
+    }, 500);
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Generate New Reflection';
+  }
+});
     // Render reflection card with continue conversation UI
     function renderReflectionCard(result, context, reflectionNum) {
       // Use passed reflectionNum, or fall back to current reflectionsUsed
