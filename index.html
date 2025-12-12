@@ -5,37 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ANIMA - AI Reflective Companion</title>
   <style>
-    /* ============================================
-   ANIMA - COMPLETE UPDATED CSS
-   All changes for chat-style interface
-   ============================================ */
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Light mode base: white - light gray */
   --bg-primary: #f5f5f5;
   --bg-secondary: #ebebeb;
   --bg-card: rgba(255,255,255,0.7);
   --bg-input: rgba(0,0,0,0.03);
-  
-  /* Text: black for bold, dark gray for regular */
   --text-primary: #1a1a1a;
   --text-bold: #000000;
   --text-secondary: #4a4a4a;
   --text-muted: #888888;
-  
-  /* Lavender accent for selections */
   --accent: rgba(140,120,180,0.95);
   --accent-soft: rgba(140,120,180,0.7);
   --accent-bg: rgba(160,140,200,0.15);
   --accent-border: rgba(140,120,180,0.4);
-  
-  /* Borders: subtle grays */
   --border: rgba(0,0,0,0.08);
   --border-hover: rgba(0,0,0,0.15);
-  
-  /* Chart color: muted lavender-gray */
   --chart-line: rgba(120,100,160,0.6);
   --chart-baseline: rgba(0,0,0,0.1);
 }
@@ -50,7 +36,6 @@ body {
 
 .container { max-width: 540px; margin: 0 auto; padding: 20px; }
 
-/* Header */
 .header { text-align: center; padding: 40px 0 30px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
 .logo { font-size: 2.8rem; font-weight: 300; letter-spacing: 0.35em; color: var(--text-bold); margin-bottom: 8px; }
 .subtitle { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; }
@@ -62,25 +47,18 @@ body {
 .badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-/* Sections */
 .section { margin-bottom: 28px; padding: 20px; background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); }
 .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-bold); }
 .section-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
 
-/* Cycle Phase Selector - 2x2 grid */
 .cycle-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
 .cycle-option {
   padding: 14px 10px; background: rgba(255,255,255,0.6); border: 1px solid var(--border);
-  border-radius: 10px; color: var(--text-secondary); cursor: pointer;
-  transition: all 0.2s; text-align: center;
+  border-radius: 10px; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; text-align: center;
 }
 .cycle-option:hover { background: rgba(255,255,255,0.9); border-color: var(--border-hover); }
-.cycle-option.selected { 
-  background: var(--accent-bg); 
-  border-color: var(--accent-border); 
-  color: var(--accent); 
-}
+.cycle-option.selected { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); }
 .cycle-option .phase-name { font-weight: 700; font-size: 0.9rem; display: block; margin-bottom: 4px; color: var(--text-bold); }
 .cycle-option.selected .phase-name { color: var(--accent); }
 .cycle-option .phase-simple { font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px; font-style: italic; }
@@ -88,500 +66,128 @@ body {
 .cycle-option .phase-e2 { font-size: 0.68rem; color: var(--text-muted); display: block; }
 .cycle-option.selected .phase-e2 { color: var(--accent-soft); }
 
-/* E2 Context Box */
-.e2-context {
-  margin-top: 16px; padding: 14px; background: var(--bg-input); border-radius: 10px;
-  font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
-}
+.e2-context { margin-top: 16px; padding: 14px; background: var(--bg-input); border-radius: 10px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6; }
 .e2-context strong { color: var(--text-bold); font-weight: 700; }
 
-/* E2 Panel */
 .e2-panel { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
 .e2-metric { text-align: center; }
 .e2-metric-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
 .e2-metric-value { font-size: 1.6rem; font-weight: 300; color: var(--text-bold); }
 .e2-metric-unit { font-size: 0.7rem; color: var(--text-muted); }
 
-/* E2 Category badges - neutral grays */
-.e2-category { 
-  display: inline-block; padding: 3px 10px; 
-  background: rgba(0,0,0,0.05); 
-  border-radius: 12px; font-size: 0.75rem; 
-  color: var(--text-secondary); font-weight: 500;
-}
+.e2-category { display: inline-block; padding: 3px 10px; background: rgba(0,0,0,0.05); border-radius: 12px; font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; }
 .e2-category.low { background: rgba(100,120,150,0.12); color: rgba(70,90,120,0.9); }
 .e2-category.normal { background: rgba(100,100,100,0.1); color: var(--text-secondary); }
 .e2-category.high { background: rgba(150,120,80,0.12); color: rgba(120,90,50,0.9); }
 .e2-category.very-high { background: rgba(150,100,100,0.12); color: rgba(130,70,70,0.9); }
 
-/* Chart */
 .chart-container { width: 100%; height: 100px; margin-top: 16px; border-radius: 8px; overflow: hidden; }
 #e2Chart { width: 100%; height: 100%; }
 
-/* Sliders */
 .slider-group { margin-bottom: 18px; }
 .slider-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
 .slider-label { font-size: 0.85rem; color: var(--text-bold); font-weight: 600; }
 .slider-range { font-size: 0.7rem; color: var(--text-muted); }
-input[type="range"] { 
-  width: 100%; height: 4px; -webkit-appearance: none; 
-  background: rgba(0,0,0,0.1); border-radius: 2px; outline: none; 
-}
-input[type="range"]::-webkit-slider-thumb { 
-  -webkit-appearance: none; width: 18px; height: 18px; 
-  background: var(--text-secondary); border-radius: 50%; cursor: pointer;
-  transition: background 0.2s;
-}
-input[type="range"]::-webkit-slider-thumb:hover {
-  background: var(--accent);
-}
+input[type="range"] { width: 100%; height: 4px; -webkit-appearance: none; background: rgba(0,0,0,0.1); border-radius: 2px; outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--text-secondary); border-radius: 50%; cursor: pointer; transition: background 0.2s; }
+input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent); }
 
-/* Mood chips - with emojis */
 .chip-label { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; }
 .mood-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-.mood-chip { 
-  padding: 8px 16px; background: rgba(255,255,255,0.7); 
-  border: 1px solid var(--border); border-radius: 18px; 
-  font-size: 0.85rem; color: var(--text-secondary); 
-  cursor: pointer; transition: all 0.2s; font-weight: 500;
-}
+.mood-chip { padding: 8px 16px; background: rgba(255,255,255,0.7); border: 1px solid var(--border); border-radius: 18px; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; font-weight: 500; }
 .mood-chip:hover { background: rgba(255,255,255,0.95); border-color: var(--border-hover); }
-.mood-chip.selected { 
-  background: var(--accent-bg); 
-  border-color: var(--accent-border); 
-  color: var(--accent); 
-  font-weight: 600;
-}
+.mood-chip.selected { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); font-weight: 600; }
 
-/* Journal */
-.journal-header {
-  font-size: 0.85rem; color: var(--text-bold); font-weight: 600; margin-bottom: 6px;
-}
-.journal-subheader {
-  font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;
-}
-.journal-input { 
-  width: 100%; padding: 14px; background: rgba(255,255,255,0.8); 
-  border: 1px solid var(--border); border-radius: 10px; 
-  color: var(--text-primary); font-size: 0.9rem; font-family: inherit; 
-  resize: vertical; min-height: 90px; 
-}
+.journal-header { font-size: 0.85rem; color: var(--text-bold); font-weight: 600; margin-bottom: 6px; }
+.journal-subheader { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; }
+.journal-input { width: 100%; padding: 14px; background: rgba(255,255,255,0.8); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: 0.9rem; font-family: inherit; resize: vertical; min-height: 90px; }
 .journal-input::placeholder { color: var(--text-muted); }
 .journal-input:focus { outline: none; border-color: var(--accent-border); }
 
-/* Buttons */
-.btn-group { display: flex; gap: 10px; margin-top: 16px; }
-.btn-primary { 
-  flex: 1; padding: 14px 20px; 
-  background: var(--accent-bg); 
-  border: 1px solid var(--accent-border); 
-  border-radius: 10px; color: var(--accent); 
-  font-size: 0.9rem; font-family: inherit; cursor: pointer; 
-  transition: all 0.2s; font-weight: 600;
-}
-.btn-primary:hover:not(:disabled) { 
-  background: rgba(140,120,180,0.22); 
-  border-color: rgba(140,120,180,0.55); 
-}
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-secondary { 
-  padding: 14px 16px; background: rgba(255,255,255,0.6); 
-  border: 1px solid var(--border); border-radius: 10px; 
-  color: var(--text-muted); font-size: 0.8rem; font-family: inherit; 
-  cursor: pointer; transition: all 0.2s; font-weight: 500;
-}
+.btn-secondary { padding: 14px 16px; background: rgba(255,255,255,0.6); border: 1px solid var(--border); border-radius: 10px; color: var(--text-muted); font-size: 0.8rem; font-family: inherit; cursor: pointer; transition: all 0.2s; font-weight: 500; }
 .btn-secondary:hover { background: rgba(255,255,255,0.9); border-color: var(--border-hover); }
 
-/* RAF Link - subtle */
-.raf-link {
-  background: none; border: none; 
-  color: var(--text-muted); font-size: 0.7rem; 
-  cursor: pointer; font-family: inherit;
-  padding: 4px 0; transition: color 0.2s;
-}
+.raf-link { background: none; border: none; color: var(--text-muted); font-size: 0.7rem; cursor: pointer; font-family: inherit; padding: 4px 0; transition: color 0.2s; }
 .raf-link:hover { color: var(--accent); }
 
-/* Generate Button - full width */
-.btn-generate {
-  width: 100%; padding: 14px 20px;
-  background: var(--accent-bg);
-  border: 1px solid var(--accent-border);
-  border-radius: 10px; color: var(--accent);
-  font-size: 0.9rem; font-family: inherit; cursor: pointer;
-  transition: all 0.2s; font-weight: 600;
-}
-.btn-generate:hover:not(:disabled) {
-  background: rgba(140,120,180,0.22);
-  border-color: rgba(140,120,180,0.55);
-}
+.btn-generate { width: 100%; padding: 14px 20px; background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: 10px; color: var(--accent); font-size: 0.9rem; font-family: inherit; cursor: pointer; transition: all 0.2s; font-weight: 600; margin-bottom: 20px; }
+.btn-generate:hover:not(:disabled) { background: rgba(140,120,180,0.22); border-color: rgba(140,120,180,0.55); }
 .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Loading animation */
 .loading { display: inline-flex; gap: 4px; align-items: center; }
 .loading-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: loadingPulse 1s infinite; }
 .loading-dot:nth-child(2) { animation-delay: 0.2s; }
 .loading-dot:nth-child(3) { animation-delay: 0.4s; }
 @keyframes loadingPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-/* HIDDEN - Reflection Limit Counter */
-.reflection-limit {
-  display: none !important;
-}
+.limit-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; }
+.limit-modal.visible { display: flex; }
+.limit-modal-content { background: white; padding: 32px; border-radius: 16px; max-width: 400px; text-align: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); }
+.limit-modal-title { font-size: 1.2rem; font-weight: 700; color: var(--text-bold); margin-bottom: 12px; }
+.limit-modal-message { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
+.limit-modal-btn { padding: 12px 24px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.limit-modal-btn:hover { background: rgba(140, 120, 180, 1); transform: translateY(-1px); }
 
-/* NEW - Limit Modal */
-.limit-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-}
+#conversationThread { margin-top: 0; }
 
-.limit-modal.visible {
-  display: flex;
-}
+.chat-bubbles-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
 
-.limit-modal-content {
-  background: white;
-  padding: 32px;
-  border-radius: 16px;
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
+.reflection-bubble { padding: 16px; background: rgba(255, 255, 255, 0.8); border: 1px solid var(--border); border-radius: 12px; animation: fadeIn 0.3s ease; }
+.reflection-bubble.user-bubble { background: rgba(140,120,180,0.08); border-left: 3px solid var(--accent); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-.limit-modal-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-bold);
-  margin-bottom: 12px;
-}
+.reflection-text { font-size: 0.95rem; line-height: 1.7; color: var(--text-primary); margin-bottom: 8px; }
+.user-bubble .reflection-text { font-size: 0.9rem; }
 
-.limit-modal-message {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin-bottom: 24px;
-}
+.reflection-meta { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 8px; border-top: 1px solid var(--border); margin-top: 8px; }
+.meta-tag { font-size: 0.68rem; color: var(--text-muted); background: rgba(0, 0, 0, 0.04); padding: 3px 8px; border-radius: 4px; font-weight: 500; }
 
-.limit-modal-btn {
-  padding: 12px 24px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+.reflection-feedback { display: flex; gap: 8px; align-items: center; padding: 8px 0; }
+.feedback-label { font-size: 0.75rem; color: var(--text-muted); margin-right: 4px; }
+.feedback-btn { padding: 6px 12px; background: rgba(255, 255, 255, 0.8); border: 1px solid var(--border); border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; font-family: inherit; }
+.feedback-btn:hover { background: rgba(255, 255, 255, 1); border-color: var(--border-hover); }
+.feedback-btn.active.thumbs-up { background: rgba(100, 200, 100, 0.1); border-color: rgba(100, 200, 100, 0.4); color: #4a4; font-weight: 600; }
+.feedback-btn.active.thumbs-down { background: rgba(200, 100, 100, 0.1); border-color: rgba(200, 100, 100, 0.4); color: #955; font-weight: 600; }
 
-.limit-modal-btn:hover {
-  background: rgba(140, 120, 180, 1);
-  transform: translateY(-1px);
-}
+.single-reply-container { margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.6); border: 1px solid var(--border); border-radius: 10px; }
+.reply-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
+.reply-input-group { display: flex; gap: 8px; align-items: flex-end; }
+.reply-input { flex: 1; padding: 10px 12px; background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-family: inherit; color: var(--text-primary); resize: none; min-height: 42px; max-height: 120px; }
+.reply-input::placeholder { color: var(--text-muted); }
+.reply-input:focus { outline: none; border-color: var(--accent-border); }
+.reply-btn { padding: 10px 16px; background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: 8px; color: var(--accent); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; height: 42px; font-family: inherit; }
+.reply-btn:hover:not(:disabled) { background: rgba(140, 120, 180, 0.22); border-color: rgba(140, 120, 180, 0.55); }
+.reply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Complete Session Button */
-.complete-session {
-  margin-bottom: 20px; padding: 16px;
-  background: var(--accent-bg); border: 1px solid var(--accent-border);
-  border-radius: 10px; text-align: center;
-}
-.complete-message {
-  font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;
-}
-.complete-btn {
-  display: inline-block; padding: 12px 24px;
-  background: var(--accent); color: white;
-  border-radius: 8px; font-size: 0.85rem; font-weight: 600;
-  text-decoration: none; transition: all 0.2s;
-}
-.complete-btn:hover { background: rgba(140,120,180,1); transform: translateY(-1px); }
+.session-history { margin-bottom: 16px; }
+.session-history-header { font-size: 0.8rem; color: var(--text-bold); font-weight: 600; padding: 12px 16px; background: rgba(255, 255, 255, 0.6); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+.session-history-header:hover { background: rgba(255, 255, 255, 0.8); }
+.session-count { color: var(--text-muted); font-size: 0.75rem; font-weight: 400; }
+.session-toggle { font-size: 0.7rem; color: var(--text-muted); }
+.session-panel { display: none; padding: 16px; background: rgba(255, 255, 255, 0.5); border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; max-height: 400px; overflow-y: auto; margin-top: -10px; }
+.session-panel.visible { display: block; }
+.session-empty { color: var(--text-muted); font-size: 0.8rem; font-style: italic; text-align: center; }
+.session-list { display: flex; flex-direction: column; gap: 12px; }
+.session-item { padding: 14px; background: rgba(255, 255, 255, 0.7); border: 1px solid var(--border); border-radius: 8px; }
+.session-item.user-entry { background: rgba(140, 120, 180, 0.08); border-left: 3px solid var(--accent-soft); }
+.session-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.7rem; color: var(--text-muted); }
+.session-item-source { font-size: 0.65rem; padding: 2px 6px; background: var(--accent-bg); border-radius: 4px; color: var(--accent); }
+.session-item-text { font-size: 0.85rem; line-height: 1.6; color: var(--text-primary); }
 
-/* UPDATED - Chat-style conversation thread */
-#conversationThread {
-  margin-top: 20px;
-}
-
-.reflection-bubble {
-  margin-bottom: 20px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn { 
-  from { opacity: 0; transform: translateY(8px); } 
-  to { opacity: 1; transform: translateY(0); } 
-}
-
-.reflection-text {
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-}
-
-.reflection-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px 0;
-  border-top: 1px solid var(--border);
-  margin-bottom: 12px;
-}
-
-.meta-tag {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  background: rgba(0, 0, 0, 0.04);
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-/* NEW - Inline feedback buttons */
-.reflection-feedback {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 12px;
-}
-
-.feedback-label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-right: 4px;
-}
-
-.feedback-btn {
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: inherit;
-}
-
-.feedback-btn:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: var(--border-hover);
-}
-
-.feedback-btn.active.thumbs-up {
-  background: rgba(100, 200, 100, 0.1);
-  border-color: rgba(100, 200, 100, 0.4);
-  color: #4a4;
-  font-weight: 600;
-}
-
-.feedback-btn.active.thumbs-down {
-  background: rgba(200, 100, 100, 0.1);
-  border-color: rgba(200, 100, 100, 0.4);
-  color: #955;
-  font-weight: 600;
-}
-
-/* NEW - Chat-style response input */
-.chat-response {
-  margin-top: 0;
-}
-
-.chat-input-container {
-  display: flex;
-  gap: 8px;
-  align-items: flex-end;
-}
-
-.chat-input {
-  flex: 1;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-family: inherit;
-  color: var(--text-primary);
-  resize: none;
-  min-height: 42px;
-  max-height: 120px;
-  overflow-y: auto;
-}
-
-.chat-input::placeholder {
-  color: var(--text-muted);
-}
-
-.chat-input:focus {
-  outline: none;
-  border-color: var(--accent-border);
-}
-
-.chat-send-btn {
-  padding: 10px 16px;
-  background: var(--accent-bg);
-  border: 1px solid var(--accent-border);
-  border-radius: 8px;
-  color: var(--accent);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-  height: 42px;
-  font-family: inherit;
-}
-
-.chat-send-btn:hover:not(:disabled) {
-  background: rgba(140, 120, 180, 0.22);
-  border-color: rgba(140, 120, 180, 0.55);
-}
-
-.chat-send-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* UPDATED - Collapsible Session History */
-.session-history {
-  margin-bottom: 16px;
-}
-
-.session-history-header {
-  font-size: 0.8rem;
-  color: var(--text-bold);
-  font-weight: 600;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.2s;
-}
-
-.session-history-header:hover {
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.session-count {
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  font-weight: 400;
-}
-
-.session-toggle {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-.session-panel {
-  display: none;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid var(--border);
-  border-top: none;
-  border-radius: 0 0 10px 10px;
-  max-height: 400px;
-  overflow-y: auto;
-  margin-top: -10px;
-}
-
-.session-panel.visible {
-  display: block;
-}
-
-.session-empty {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-style: italic;
-  text-align: center;
-}
-
-.session-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.session-item {
-  padding: 14px;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-
-.session-item.user-entry {
-  background: rgba(140, 120, 180, 0.08);
-  border-left: 3px solid var(--accent-soft);
-}
-
-.session-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-.session-item-source {
-  font-size: 0.65rem;
-  padding: 2px 6px;
-  background: var(--accent-bg);
-  border-radius: 4px;
-  color: var(--accent);
-}
-
-.session-item-text {
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: var(--text-primary);
-}
-
-/* RAF Panel */
-.raf-panel { 
-  margin-top: 16px; padding: 18px; 
-  background: var(--bg-input); 
-  border-radius: 10px; font-size: 0.82rem; line-height: 1.6; display: none; 
-}
+.raf-panel { margin-top: 16px; padding: 18px; background: var(--bg-input); border-radius: 10px; font-size: 0.82rem; line-height: 1.6; display: none; }
 .raf-panel.visible { display: block; animation: fadeIn 0.3s ease; }
-.raf-panel h4 { color: var(--text-bold); margin-bottom: 10px; font-weight: 700; }
-.raf-panel p { color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6; }
-.raf-panel .raf-intro { font-size: 0.88rem; margin-bottom: 16px; }
-.raf-panel .raf-intro em { color: var(--accent); font-style: italic; }
-.raf-panel .raf-principle { margin-bottom: 14px; }
-.raf-panel .raf-principle strong { color: var(--text-bold); font-weight: 700; display: block; margin-bottom: 4px; font-size: 0.85rem; }
-.raf-panel .raf-principle p { font-size: 0.82rem; margin-bottom: 0; color: var(--text-secondary); }
-.raf-panel .raf-footer { font-size: 0.8rem; color: var(--text-bold); margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
 
-/* Footer */
 .footer { text-align: center; padding: 30px 20px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
 .footer p { margin-bottom: 8px; }
 .footer-credit { font-size: 0.7rem; margin-top: 12px; }
+.complete-session { margin-bottom: 20px; padding: 16px; background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: 10px; text-align: center; }
+.complete-message { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px; }
+.complete-btn { display: inline-block; padding: 12px 24px; background: var(--accent); color: white; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+.complete-btn:hover { background: rgba(140,120,180,1); transform: translateY(-1px); }
 
-/* Error message */
-.error-message {
-  padding: 12px 16px; margin: 10px 0;
-  background: rgba(200, 100, 100, 0.1); border: 1px solid rgba(200, 100, 100, 0.3);
-  border-radius: 8px; font-size: 0.85rem; color: #955;
-}
+.error-message { padding: 12px 16px; margin: 10px 0; background: rgba(200, 100, 100, 0.1); border: 1px solid rgba(200, 100, 100, 0.3); border-radius: 8px; font-size: 0.85rem; color: #955; }
+
+.hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -595,7 +201,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
       </div>
     </header>
 
-    <!-- Cycle Context -->
     <section class="section" id="cycle-context">
       <h2 class="section-title">Cycle Context</h2>
       <p class="section-desc">Select where you are in your cycle. This helps ANIMA understand your hormonal context.</p>
@@ -628,7 +233,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
       </div>
     </section>
 
-    <!-- E2 Sensing -->
     <section class="section" id="e2-sensing">
       <div class="section-header">
         <h2 class="section-title">E2 Sensing Layer (Simulated)</h2>
@@ -655,7 +259,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
       <div class="chart-container"><canvas id="e2Chart"></canvas></div>
     </section>
 
-    <!-- Self-Report -->
     <section class="section" id="self-report">
       <h2 class="section-title">Self-Report</h2>
       <p class="section-desc">These inputs help ANIMA calibrate its reflection to your current state. All fields are optional.</p>
@@ -686,71 +289,51 @@ input[type="range"]::-webkit-slider-thumb:hover {
       <textarea id="journalInput" class="journal-input" placeholder=""></textarea>
     </section>
 
-    <!-- AI Reflection Section -->
-<section class="section" id="ai-reflection">
-  <div class="section-header">
-    <h2 class="section-title">Let's Reflect</h2>
-    <button id="rafInfoBtn" class="raf-link">About RAF ›</button>
-  </div>
-  <p class="section-desc">ANIMA generates personalized reflections based on your cycle and self-report. All reflections follow the Reflective Agency Framework—no diagnoses, no prescriptions.</p>
-  
-  <div id="rafPanel" class="raf-panel">
-    <!-- RAF content stays the same -->
-  </div>
-  
-  <!-- HIDDEN reflection counter -->
-  <div class="reflection-limit" style="display: none;">
-    <span id="reflectionCounter">5 reflections remaining</span>
-  </div>
-  
-  <button id="generateBtn" class="btn-generate">Generate Reflection</button>
-  
-  <!-- Conversation thread (replaces old reflection-card) -->
-  <div id="conversationThread"></div>
-</section>
-
-<!-- COLLAPSIBLE Session History -->
-<section class="section session-history">
-  <div class="session-history-header" id="sessionToggle">
-    <span>My Session <span class="session-count" id="sessionCount">(0)</span></span>
-    <span class="session-toggle">▼ Show</span>
-  </div>
-  <div class="session-panel" id="sessionPanel">
-    <div id="sessionList" class="session-list">
-      <p class="session-empty">No reflections yet. Generate one to get started.</p>
-    </div>
-  </div>
-</section>
-
-<!-- Limit Reached Modal -->
-<div id="limitModal" class="limit-modal">
-  <div class="limit-modal-content">
-    <h3 class="limit-modal-title">You've used all your reflections</h3>
-    <p class="limit-modal-message">We hope ANIMA was helpful! We're working to make this more accessible soon. For now, please complete the post-survey to finish the study.</p>
-    <button class="limit-modal-btn" onclick="closeLimitModal()">Got it</button>
-  </div>
-</div>
-
-    <!-- Session History -->
-    <section class="section session-history">
-      <div class="session-history-header">
-        My Session <span class="session-count" id="sessionCount">(0)</span>
+    <section class="section" id="ai-reflection">
+      <div class="section-header">
+        <h2 class="section-title">Let's Reflect</h2>
+        <button id="rafInfoBtn" class="raf-link">About RAF ›</button>
       </div>
-      <div class="session-panel">
+      <p class="section-desc">ANIMA generates personalized reflections based on your cycle and self-report. All reflections follow the Reflective Agency Framework—no diagnoses, no prescriptions.</p>
+      
+      <div id="rafPanel" class="raf-panel"></div>
+      
+      <button id="generateBtn" class="btn-generate">Generate Reflection</button>
+      
+      <div id="conversationThread">
+        <div class="chat-bubbles-container" id="chatBubbles"></div>
+        
+        <div class="single-reply-container" id="replyContainer" style="display: none;">
+          <div class="reply-label">Reply to ANIMA</div>
+          <div class="reply-input-group">
+            <textarea class="reply-input" id="replyInput" placeholder="Share your thoughts..." rows="1"></textarea>
+            <button class="reply-btn" id="replyBtn">Send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section session-history">
+      <div class="session-history-header" id="sessionToggle">
+        <span>My Session <span class="session-count" id="sessionCount">(0)</span></span>
+        <span class="session-toggle">▼ Show</span>
+      </div>
+      <div class="session-panel" id="sessionPanel">
         <div id="sessionList" class="session-list">
           <p class="session-empty">No reflections yet. Generate one to get started.</p>
         </div>
       </div>
     </section>
 
-    <footer class="footer">
-      <!-- Reflection reminder -->
-      <div id="reflectionReminder" class="reflection-reminder hidden">
-        <p class="reminder-text">You still have <span id="reminderCount">5</span> reflections remaining.</p>
-        <p class="reminder-question">Would you like to generate another?</p>
-        <button class="reminder-btn" onclick="scrollToReflect()">Generate Another Reflection</button>
+    <div id="limitModal" class="limit-modal">
+      <div class="limit-modal-content">
+        <h3 class="limit-modal-title">You've used all your reflections</h3>
+        <p class="limit-modal-message">We hope ANIMA was helpful! We're working to make this more accessible soon. For now, please complete the post-survey to finish the study.</p>
+        <button class="limit-modal-btn" onclick="closeLimitModal()">Got it</button>
       </div>
-      
+    </div>
+
+    <footer class="footer">
       <div class="complete-session">
         <p class="complete-message">When you're ready, complete the post-survey to finish the study.</p>
         <a id="completeBtn" href="#" class="complete-btn">Complete Session →</a>
@@ -762,23 +345,18 @@ input[type="range"]::-webkit-slider-thumb:hover {
   </div>
 
   <script>
-    // ============================================
-    // GOOGLE SHEETS DATA COLLECTION
-    // ============================================
     const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyRbcJAbOGfkOBTJybhJWWFUXgdsNUsAf5h2p53TQMY96aSLRKqpB0j5_YPjtQe_lwBzg/exec';
-    let currentReflectionId = 0;
-    // Generate unique visitor ID for THIS session
+    
     function generateVisitorId() {
       const timestamp = Date.now();
       const random = Math.random().toString(36).substr(2, 6).toUpperCase();
       return `ANIMA_${timestamp}_${random}`;
     }
     
-    // Always generate a NEW ID for each page load (each session)
     const visitorId = generateVisitorId();
-    console.log('Session ID:', visitorId);
+    const urlParams = new URLSearchParams(window.location.search);
+    const prolificPid = urlParams.get("PROLIFIC_PID");
     
-    // Comprehensive analytics tracker
     const Analytics = {
       sessionStart: Date.now(),
       firstReflectionTime: null,
@@ -792,49 +370,34 @@ input[type="range"]::-webkit-slider-thumb:hover {
       reflectionDismissals: 0,
       lastSelfReportState: null,
       dataSubmitted: false,
-      
-      // Track ALL self-reports throughout session
       selfReportHistory: [],
       cyclePhaseHistory: [],
       e2History: [],
       
       trackFirstReflection() {
-        if (!this.firstReflectionTime) {
-          this.firstReflectionTime = Date.now();
-        }
+        if (!this.firstReflectionTime) this.firstReflectionTime = Date.now();
         this.reflectionTimestamps.push(Date.now());
       },
       
       trackE2(value) {
-        if (this.e2ValueFirst === null) {
-          this.e2ValueFirst = value;
-        }
+        if (this.e2ValueFirst === null) this.e2ValueFirst = value;
         this.e2ValueLast = value;
-        
-        // Log significant E2 changes
         const lastLogged = this.e2History.length > 0 ? this.e2History[this.e2History.length - 1].value : null;
         if (lastLogged === null || Math.abs(value - lastLogged) >= 5) {
-          this.e2History.push({
-            timestamp: new Date().toISOString(),
-            value: value.toFixed(0)
-          });
+          this.e2History.push({ timestamp: new Date().toISOString(), value: value.toFixed(0) });
         }
       },
       
       trackCyclePhaseChange(phase) {
         this.cyclePhaseChanges++;
-        this.cyclePhaseHistory.push({
-          timestamp: new Date().toISOString(),
-          phase: phase
-        });
+        this.cyclePhaseHistory.push({ timestamp: new Date().toISOString(), phase });
       },
       
-      // Capture full self-report snapshot before each reflection
       captureSelfReport(selfReport, cyclePhase, e2Value, reflectionIndex) {
         this.selfReportHistory.push({
           timestamp: new Date().toISOString(),
-          reflectionIndex: reflectionIndex,
-          cyclePhase: cyclePhase,
+          reflectionIndex,
+          cyclePhase,
           e2Value: e2Value ? e2Value.toFixed(0) : '',
           energy: selfReport.energy,
           stress: selfReport.stress,
@@ -852,27 +415,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
       },
       
       trackError(error) {
-        this.errorsEncountered.push({
-          time: new Date().toISOString(),
-          error: error.toString()
-        });
-      },
-      
-      trackRegenerate() {
-        this.regenerateCount++;
-      },
-      
-      trackDismissal() {
-        this.reflectionDismissals++;
+        this.errorsEncountered.push({ time: new Date().toISOString(), error: error.toString() });
       },
       
       getSessionDuration() {
-        return ((Date.now() - this.sessionStart) / 1000 / 60).toFixed(2); // minutes
+        return ((Date.now() - this.sessionStart) / 1000 / 60).toFixed(2);
       },
       
       getTimeToFirstReflection() {
         if (!this.firstReflectionTime) return '';
-        return ((this.firstReflectionTime - this.sessionStart) / 1000).toFixed(1); // seconds
+        return ((this.firstReflectionTime - this.sessionStart) / 1000).toFixed(1);
       },
       
       getAvgTimeBetweenReflections() {
@@ -881,11 +433,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
         for (let i = 1; i < this.reflectionTimestamps.length; i++) {
           total += this.reflectionTimestamps[i] - this.reflectionTimestamps[i-1];
         }
-        return (total / (this.reflectionTimestamps.length - 1) / 1000).toFixed(1); // seconds
+        return (total / (this.reflectionTimestamps.length - 1) / 1000).toFixed(1);
       }
     };
     
-    // Get device info
     function getDeviceInfo() {
       const ua = navigator.userAgent;
       let deviceType = 'desktop';
@@ -901,19 +452,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
       return { deviceType, browser, screenWidth: window.innerWidth };
     }
     
-    // ============================================
-    // SEND DATA PER REFLECTION
-    // ============================================
-    // Track which reflections have been sent to avoid duplicates
     const sentReflections = new Set();
+    const reflectionSnapshots = {};
     
-    // Send data for a specific reflection (called after each AI response)
     function sendReflectionData(reflectionNumber, aiResponse, selfReportAtTime, continuedThoughts = [], forceUpdate = false) {
       const reflectionKey = `${visitorId}_${reflectionNumber}`;
       const isUpdate = sentReflections.has(reflectionKey);
       
-      // Skip only if it's a duplicate initial send with no new data
-      // Allow updates for: continued thoughts, resonance changes (forceUpdate), or first send
       if (isUpdate && continuedThoughts.length === 0 && !forceUpdate) {
         console.log('Skipping duplicate send for reflection', reflectionNumber);
         return;
@@ -921,200 +466,45 @@ input[type="range"]::-webkit-slider-thumb:hover {
       
       const deviceInfo = getDeviceInfo();
       const sessionId = (prolificPid && prolificPid.length > 0) ? prolificPid : visitorId;
-      
-      // Count only user messages (not AI responses) in continued thoughts
       const userContinuedCount = continuedThoughts.filter(t => !t.startsWith('[AI]:')).length;
       
       const data = {
-        // SESSION INFO (A-C)
         timestamp: new Date().toISOString(),
         sessionId: sessionId,
         sessionDuration: Analytics.getSessionDuration(),
-        
-        // SELF-REPORT DATA (D-H)
         cyclePhase: selfReportAtTime.cyclePhase,
         energyLevel: selfReportAtTime.energy,
         stressLevel: selfReportAtTime.stress,
         selectedMoods: Array.isArray(selfReportAtTime.selectedMoods) ? selfReportAtTime.selectedMoods.join(', ') : selfReportAtTime.selectedMoods,
         journalEntry: selfReportAtTime.journal || '',
-        
-        // ENGAGEMENT METRICS (I-M)
         reflectionNumber: reflectionNumber,
-        // Only include resonance if this is a resonance update (forceUpdate), otherwise leave blank
         resonated: forceUpdate ? (selfReportAtTime.resonated || '') : '',
         regenerateCount: Analytics.regenerateCount || 0,
         continuedThoughtsCount: userContinuedCount,
-        
-        // E2/HORMONAL CONTEXT (N-P)
         e2Value: selfReportAtTime.e2Value || '',
         e2Trend: selfReportAtTime.e2Trend || '',
-        
-        // FULL CONTENT (Q-T)
         aiReflectionText: aiResponse,
         continuedThoughts: continuedThoughts.join(' | '),
-        
-        // TECHNICAL (AC-AG)
         deviceType: deviceInfo.deviceType,
         screenWidth: deviceInfo.screenWidth,
         browserType: deviceInfo.browser,
-        isUpdate: isUpdate,
-        
-        // RAF SPECIFIC (AH-AM)
-        userInitiatedCount: reflectionNumber + userContinuedCount,
-        conversationDepth: continuedThoughts.length,
-        reflectionDismissals: Analytics.reflectionDismissals || 0,
-        selfReportSnapshot: {
-          energy: selfReportAtTime.energy,
-          stress: selfReportAtTime.stress,
-          moods: selfReportAtTime.selectedMoods
-        },
-        cyclePhaseAtTime: selfReportAtTime.cyclePhase,
-        e2AtTime: selfReportAtTime.e2Value
+        isUpdate: isUpdate
       };
       
       sentReflections.add(reflectionKey);
       
-      // Send to Google Sheets
       fetch(GOOGLE_SHEETS_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       }).then(() => {
-        console.log(`Reflection ${reflectionNumber} data sent (update: ${isUpdate}):`, data);
+        console.log(`Reflection ${reflectionNumber} data sent (update: ${isUpdate})`);
       }).catch(err => {
         console.error('Error sending reflection data:', err);
       });
     }
     
-    // Store self-report snapshots per reflection for later updates
-    const reflectionSnapshots = {};
-
-    // ============================================
-    // QUALTRICS / PROLIFIC INTEGRATION
-    // ============================================
-    const postSurveyBase = "https://mit.co1.qualtrics.com/jfe/form/SV_0JuC9TggUE1uHnU";
-    const urlParams = new URLSearchParams(window.location.search);
-    const prolificPid = urlParams.get("PROLIFIC_PID");
-
-    const completeBtn = document.getElementById("completeBtn");
-    if (completeBtn) {
-      completeBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        
-        // Prevent duplicate submissions
-        if (Analytics.dataSubmitted) {
-          // Already submitted, just redirect
-          if (prolificPid) {
-            window.location.href = `${postSurveyBase}?PROLIFIC_PID=${encodeURIComponent(prolificPid)}`;
-          } else {
-            window.location.href = postSurveyBase;
-          }
-          return;
-        }
-        Analytics.dataSubmitted = true;
-        
-        // Collect all data
-        const deviceInfo = getDeviceInfo();
-        const selfReport = getCurrentSelfReport();
-        const conversationHistory = ConversationThread.getHistory();
-        
-        const data = {
-          // SESSION INFO - ID will be generated by Google Apps Script
-          visitorId: visitorId,
-          prolificPid: (prolificPid && prolificPid.length > 0) ? prolificPid : visitorId,
-          sessionDuration: Analytics.getSessionDuration(),
-          
-          // SELF-REPORT DATA (final state)
-          cyclePhase: currentCyclePhase,
-          energyLevel: selfReport.energy,
-          stressLevel: selfReport.stress,
-          selectedMoods: selfReport.selectedMoods.join(', '),
-          journalEntry: selfReport.journal,
-          
-          // ENGAGEMENT METRICS
-          reflectionsGenerated: reflectionsUsed,
-          resonatesCount: resonanceData.resonates,
-          doesntResonateCount: resonanceData.doesntResonate,
-          regenerateCount: Analytics.regenerateCount,
-          conversationContinues: conversationHistory.filter(e => e.type === 'user').length,
-          
-          // E2/HORMONAL CONTEXT
-          e2ValueFirst: Analytics.e2ValueFirst ? Analytics.e2ValueFirst.toFixed(0) : '',
-          e2ValueLast: Analytics.e2ValueLast ? Analytics.e2ValueLast.toFixed(0) : '',
-          e2Trend: currentFeatures ? currentFeatures.trend : '',
-          
-          // FULL CONTENT - ALL reflections and responses
-          allReflectionTexts: conversationHistory.filter(e => e.type === 'reflection').map(e => e.content),
-          allUserResponses: conversationHistory.filter(e => e.type === 'user').map(e => e.content),
-          resonanceHistory: resonanceData.history,
-          fullConversationThread: conversationHistory,
-          
-          // BEHAVIORAL TIMING
-          timeToFirstReflection: Analytics.getTimeToFirstReflection(),
-          avgTimeBetweenReflections: Analytics.getAvgTimeBetweenReflections(),
-          timeSpentReading: '',
-          cyclePhaseChanges: Analytics.cyclePhaseChanges,
-          selfReportChanges: Analytics.selfReportChanges,
-          
-          // QUALITATIVE DEPTH
-          journalWordCount: selfReport.journal ? selfReport.journal.split(/\s+/).filter(w => w).length : 0,
-          userResponseWordCounts: conversationHistory.filter(e => e.type === 'user').map(e => e.content.split(/\s+/).filter(w => w).length),
-          exitThoughts: '',
-          
-          // TECHNICAL/CONTEXT
-          deviceType: deviceInfo.deviceType,
-          screenWidth: deviceInfo.screenWidth,
-          browserType: deviceInfo.browser,
-          errorsEncountered: Analytics.errorsEncountered,
-          completedSession: true,
-          
-          // RAF-SPECIFIC
-          userInitiatedCount: reflectionsUsed + conversationHistory.filter(e => e.type === 'user').length,
-          conversationDepth: Math.max(0, ...conversationHistory.reduce((acc, e, i) => {
-            if (e.type === 'reflection') acc.push(conversationHistory.slice(0, i+1).filter(x => x.type === 'user').length);
-            return acc;
-          }, [0])),
-          reflectionDismissals: Analytics.reflectionDismissals,
-          
-          // HISTORY - all self-reports throughout session
-          selfReportHistory: Analytics.selfReportHistory,
-          cyclePhaseHistory: Analytics.cyclePhaseHistory,
-          e2History: Analytics.e2History
-        };
-        
-        // Use fetch with no-cors mode for reliable delivery
-        fetch(GOOGLE_SHEETS_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data)
-        }).then(() => {
-          console.log('Data sent to Google Sheets');
-        }).catch(err => {
-          console.error('Fetch error:', err);
-        });
-        
-        console.log('Data being sent:', data);
-        
-        // Small delay to ensure request is sent, then redirect
-        setTimeout(() => {
-          if (prolificPid) {
-            window.location.href = `${postSurveyBase}?PROLIFIC_PID=${encodeURIComponent(prolificPid)}`;
-          } else {
-            window.location.href = postSurveyBase;
-          }
-        }, 300);
-      });
-    }
-
-    // ============================================
-    // CYCLE PHASE CONTEXT
-    // ============================================
     const CYCLE_CONTEXTS = {
       menstrual: {
         baseline: 40,
@@ -1139,19 +529,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
     };
     
     let currentCyclePhase = 'menstrual';
-
-    // ============================================
-    // E2 SIMULATOR
-    // ============================================
+    
     const E2Simulator = {
       series: [],
       baseline: 40,
       running: true,
       listeners: [],
       
-      setBaseline(newBaseline) {
-        this.baseline = newBaseline;
-      },
+      setBaseline(newBaseline) { this.baseline = newBaseline; },
       
       step() {
         let next;
@@ -1182,14 +567,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
         return this.running;
       },
       
-      onUpdate(cb) {
-        this.listeners.push(cb);
-      }
+      onUpdate(cb) { this.listeners.push(cb); }
     };
-
-    // ============================================
-    // FEATURE EXTRACTION
-    // ============================================
+    
     function extractFeatures(series, baseline) {
       if (!series || series.length === 0) {
         return { value: baseline, category: 'Normal', trend: 'Stable', delta10m: 0 };
@@ -1215,19 +595,15 @@ input[type="range"]::-webkit-slider-thumb:hover {
       
       return { value, category, trend, delta10m };
     }
-
-    // ============================================
-    // CONVERSATION THREAD MANAGER
-    // Critical for maintaining conversation continuity
-    // ============================================
+    
     const ConversationThread = {
       entries: [],
-      lastContext: null, // Track the context used for the last reflection
+      lastContext: null,
+      currentReflectionNum: 0,
       
-      // Add an entry (user response or AI reflection)
       add(type, content, meta = {}) {
         const entry = {
-          type, // 'user' or 'reflection'
+          type,
           content,
           time: new Date().toLocaleTimeString(),
           timestamp: Date.now(),
@@ -1237,13 +613,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
         return entry;
       },
       
-      // Clear all entries (start fresh)
       clear() {
         this.entries = [];
         this.lastContext = null;
       },
       
-      // Store context snapshot
       setLastContext(context) {
         this.lastContext = JSON.stringify({
           cyclePhase: context.cyclePhase,
@@ -1253,7 +627,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
         });
       },
       
-      // Check if context changed significantly
       hasContextChanged(newContext) {
         if (!this.lastContext) return false;
         const newSnap = JSON.stringify({
@@ -1265,26 +638,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
         return this.lastContext !== newSnap;
       },
       
-      // Get all entries
-      getHistory() {
-        return this.entries;
-      },
+      getHistory() { return this.entries; },
       
-      // Get the last user response (for follow-ups)
-      getLastUserResponse() {
-        for (let i = this.entries.length - 1; i >= 0; i--) {
-          if (this.entries[i].type === 'user') {
-            return this.entries[i].content;
-          }
-        }
-        return null;
-      },
-      
-      // Format entire conversation for AI prompt
-      // This is CRITICAL - it gives the AI the full context
       getForPrompt() {
         if (this.entries.length === 0) return '';
-        
         return this.entries.map((e, i) => {
           if (e.type === 'user') {
             return `[User's response #${Math.ceil((i+1)/2)}]: "${e.content}"`;
@@ -1294,54 +651,26 @@ input[type="range"]::-webkit-slider-thumb:hover {
         }).join('\n\n');
       },
       
-      // Get count
       getCount() {
         return this.entries.filter(e => e.type === 'reflection').length;
-      },
-      
-      // Render the conversation thread UI
-      render() {
-        if (this.entries.length === 0) return '';
-        
-        return `
-          <div class="conversation-thread">
-            <div class="thread-label">Conversation Thread (${this.entries.length} exchanges)</div>
-            ${this.entries.map(e => {
-              const isUser = e.type === 'user';
-              return `
-                <div class="thread-entry ${isUser ? 'user' : 'reflection'}">
-                  <div class="thread-entry-meta">
-                    <span>${isUser ? '💭 You' : '💜 ANIMA'}</span>
-                    <span>${e.time}</span>
-                  </div>
-                  <div class="thread-entry-text">${e.content}</div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        `;
       }
     };
-
-    // ============================================
-    // AI REFLECTION WITH FULL CONVERSATION CONTEXT
-    // ============================================
-
-async function generateAIReflection(context, isFollowUp = false, userJustSaid = null) {
-  const { features, selfReport, cyclePhase } = context;
-  const cycleContext = CYCLE_CONTEXTS[cyclePhase];
-
-  const energyWords = ['drained', 'low', 'moderate', 'good', 'energized'];
-  const stressWords = ['calm', 'slightly tense', 'moderate stress', 'stressed', 'overwhelmed'];
-
-  const moodsText = selfReport.selectedMoods.length > 0
-    ? selfReport.selectedMoods.join(', ')
-    : 'not specified';
-
-  const conversationHistory = ConversationThread.getForPrompt();
-  const conversationCount = ConversationThread.getCount();
-
-  const systemPrompt = `You are ANIMA, an intelligent companion who helps people understand their hormonal rhythms and develop self-awareness through ongoing dialogue.
+    
+    async function generateAIReflection(context, isFollowUp = false, userJustSaid = null) {
+      const { features, selfReport, cyclePhase } = context;
+      const cycleContext = CYCLE_CONTEXTS[cyclePhase];
+      
+      const energyWords = ['drained', 'low', 'moderate', 'good', 'energized'];
+      const stressWords = ['calm', 'slightly tense', 'moderate stress', 'stressed', 'overwhelmed'];
+      
+      const moodsText = selfReport.selectedMoods.length > 0
+        ? selfReport.selectedMoods.join(', ')
+        : 'not specified';
+      
+      const conversationHistory = ConversationThread.getForPrompt();
+      const conversationCount = ConversationThread.getCount();
+      
+      const systemPrompt = `You are ANIMA, an intelligent companion who helps people understand their hormonal rhythms and develop self-awareness through ongoing dialogue.
 
 YOUR INTELLIGENCE:
 You have the ability to:
@@ -1407,6 +736,7 @@ ${isFollowUp ?
 - You MUST acknowledge what they just said specifically
 - Reference their exact words or feelings
 - Build on what they shared
+- After they share, you can gently note that by continuing to engage, they're helping us learn patterns that could benefit them and future users
 - DO NOT end with a question—close with warm acknowledgment or gentle affirmation` : 
   `INITIAL REFLECTION:
 - End with ONE gentle, open question that invites them to share more
@@ -1436,8 +766,8 @@ ${isFollowUp ? '- NO question at the end—validate and affirm' : '- End with ON
 - Write as ONE paragraph (no bullet points)
 
 CYCLE CONTEXT: ${cycleContext.aiContext}`;
-
-  let userPrompt = `WHERE THEY ARE:
+      
+      let userPrompt = `WHERE THEY ARE:
 Cycle phase: ${cyclePhase}
 Hormonal pattern: ${features.trend.toLowerCase()}${features.category !== 'Normal' ? ` (${features.category.toLowerCase()})` : ''}
 
@@ -1445,74 +775,70 @@ HOW THEY'RE FEELING RIGHT NOW:
 Moods: ${moodsText}
 Energy: ${energyWords[selfReport.energy - 1]}
 Stress: ${stressWords[selfReport.stress - 1]}`;
-
-  if (selfReport.journal && selfReport.journal.length > 0) {
-    userPrompt += `\n\nTHEY WROTE:\n"${selfReport.journal}"
+      
+      if (selfReport.journal && selfReport.journal.length > 0) {
+        userPrompt += `\n\nTHEY WROTE:\n"${selfReport.journal}"
 
 → This is valuable. Their written reflection gives you deeper context than mood chips alone. Use their specific words and phrases—this is where the real insight lives.`;
-  }
-
-  if (conversationHistory) {
-    userPrompt += `
+      }
+      
+      if (conversationHistory) {
+        userPrompt += `
 
 --- CONVERSATION SO FAR (${conversationCount} reflection${conversationCount !== 1 ? 's' : ''}) ---
 ${conversationHistory}
 --- END CONVERSATION ---`;
-  }
-
-  if (isFollowUp && userJustSaid) {
-    userPrompt += `
+      }
+      
+      if (isFollowUp && userJustSaid) {
+        userPrompt += `
 
 ⭐ THE USER JUST RESPONDED WITH:
 "${userJustSaid}"
 
-YOUR TASK: Respond directly to what they just shared. Acknowledge their specific words or feelings. Validate their experience. DO NOT ask another question—close with warmth and affirmation.`;
-  } else if (!isFollowUp) {
-    userPrompt += `
+YOUR TASK: Respond directly to what they just shared. Acknowledge their specific words or feelings. Validate their experience. You can briefly mention that their continued engagement helps us learn patterns. DO NOT ask another question—close with warmth and affirmation.`;
+      } else if (!isFollowUp) {
+        userPrompt += `
 
 YOUR TASK: Generate a warm, observant reflection (2-4 sentences) that acknowledges their current state. Notice patterns if you see them in the conversation. End with ONE soft, open question.`;
-  }
-
-  userPrompt += `
+      }
+      
+      userPrompt += `
 
 Remember: you're reflecting and validating, not diagnosing. Respond with ONLY the reflection text (no headings, no labels, no meta commentary).`;
-
-  try {
-    const response = await fetch('/api/anthropic', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        systemPrompt: systemPrompt,
-        userPrompt: userPrompt,
-        maxTokens: 350
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('API error:', response.status, errorData);
-      throw new Error(`API error: ${response.status}`);
+      
+      try {
+        const response = await fetch('/api/anthropic', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemPrompt: systemPrompt,
+            userPrompt: userPrompt,
+            maxTokens: 350
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('API error:', response.status, errorData);
+          throw new Error(`API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const text = data.reply || '';
+        
+        return {
+          text: text || 'Unable to generate reflection.',
+          source: 'ANIMA',
+          isAI: true
+        };
+      } catch (error) {
+        console.error('AI generation failed:', error);
+        Analytics.trackError(error);
+        return null;
+      }
     }
-
-    const data = await response.json();
-    const text = data.reply || '';
     
-    return {
-      text: text || 'Unable to generate reflection.',
-      source: 'ANIMA',
-      isAI: true
-    };
-  } catch (error) {
-    console.error('AI generation failed:', error);
-    Analytics.trackError(error);
-    return null;
-  }
-}
-// ============================================
-    // CHART RENDERING
-    // ============================================
     const chartCanvas = document.getElementById('e2Chart');
     const ctx = chartCanvas.getContext('2d');
     
@@ -1559,181 +885,162 @@ Remember: you're reflecting and validating, not diagnosing. Respond with ONLY th
       });
       ctx.stroke();
     }
-    // ============================================
-// NEW FUNCTIONS - ADD THESE
-// ============================================
-
-// Close limit modal
-function closeLimitModal() {
-  document.getElementById('limitModal').classList.remove('visible');
-}
-
-// Render chat-style bubble
-function renderChatBubble(result, context, reflectionNum, bubbleId) {
-  const threadContainer = document.getElementById('conversationThread');
-  
-  const bubbleHTML = `
-    <div class="reflection-bubble" data-reflection-num="${reflectionNum}" data-bubble-id="${bubbleId}">
-      <div class="reflection-text">${result.text}</div>
-      
-      <div class="reflection-meta">
-        <span class="meta-tag">E2: ${context.features.value.toFixed(0)} pg/mL</span>
-        <span class="meta-tag">${context.features.category}</span>
-        <span class="meta-tag">${context.features.trend}</span>
-        <span class="meta-tag">Phase: ${context.cyclePhase}</span>
-      </div>
-      
-      <div class="reflection-feedback">
-        <span class="feedback-label">Was this helpful?</span>
-        <button class="feedback-btn thumbs-up" onclick="handleFeedback(${reflectionNum}, true, ${bubbleId})">
-          👍 Yes
-        </button>
-        <button class="feedback-btn thumbs-down" onclick="handleFeedback(${reflectionNum}, false, ${bubbleId})">
-          👎 Not really
-        </button>
-      </div>
-      
-      <div class="chat-response">
-        <div class="chat-input-container">
-          <textarea 
-            class="chat-input" 
-            id="chatInput${bubbleId}"
-            placeholder="Share your thoughts..."
-            rows="1"
-          ></textarea>
-          <button class="chat-send-btn" onclick="sendChatResponse(${reflectionNum}, ${bubbleId})">
-            Send
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  threadContainer.insertAdjacentHTML('beforeend', bubbleHTML);
-  
-  // Auto-resize textarea
-  const textarea = document.getElementById(`chatInput${bubbleId}`);
-  textarea.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = (this.scrollHeight) + 'px';
-  });
-  
-  // Scroll to new bubble
-  setTimeout(() => {
-    const bubble = document.querySelector(`[data-bubble-id="${bubbleId}"]`);
-    if (bubble) {
-      bubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    function closeLimitModal() {
+      document.getElementById('limitModal').classList.remove('visible');
     }
-  }, 100);
-}
-
-// Handle feedback (thumbs up/down)
-function handleFeedback(reflectionNum, isPositive, bubbleId) {
-  const bubble = document.querySelector(`[data-bubble-id="${bubbleId}"]`);
-  const buttons = bubble.querySelectorAll('.feedback-btn');
-  
-  buttons.forEach(btn => btn.classList.remove('active'));
-  
-  const clickedBtn = bubble.querySelector(isPositive ? '.thumbs-up' : '.thumbs-down');
-  clickedBtn.classList.add('active');
-  
-  if (isPositive) {
-    resonanceData.resonates++;
-  } else {
-    resonanceData.doesntResonate++;
-  }
-  
-  resonanceData.history.push({
-    timestamp: new Date().toISOString(),
-    resonated: isPositive,
-    reflectionIndex: reflectionNum
-  });
-  
-  if (reflectionSnapshots[reflectionNum]) {
-    reflectionSnapshots[reflectionNum].resonated = isPositive ? 'yes' : 'no';
     
-    sendReflectionData(
-      reflectionNum, 
-      reflectionSnapshots[reflectionNum].aiResponse, 
-      reflectionSnapshots[reflectionNum],
-      reflectionSnapshots[reflectionNum].continuedThoughts,
-      true
-    );
-  }
-  
-  console.log('Feedback tracked for reflection', reflectionNum, ':', isPositive);
-}
-
-// Send chat response
-async function sendChatResponse(reflectionNum, bubbleId) {
-  const input = document.getElementById(`chatInput${bubbleId}`);
-  const userResponse = input.value.trim();
-  
-  if (!userResponse) return;
-  
-  const sendBtn = input.nextElementSibling;
-  sendBtn.disabled = true;
-  sendBtn.innerHTML = '<span class="loading"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></span>';
-  
-  ConversationThread.add('user', userResponse);
-  
-  if (reflectionSnapshots[reflectionNum]) {
-    reflectionSnapshots[reflectionNum].continuedThoughts.push(userResponse);
-  }
-  
-  const threadContainer = document.getElementById('conversationThread');
-  threadContainer.insertAdjacentHTML('beforeend', `
-    <div class="reflection-bubble" style="background: rgba(140,120,180,0.08); border-left: 3px solid var(--accent);">
-      <div class="reflection-text" style="font-size: 0.9rem;">${userResponse}</div>
-      <div class="reflection-meta">
-        <span class="meta-tag">You</span>
-      </div>
-    </div>
-  `);
-  
-  input.value = '';
-  input.style.height = 'auto';
-  
-  const context = getCurrentContext();
-  
-  let result = await generateAIReflection(context, true, userResponse);
-  
-  if (!result) {
-    result = {
-      text: "Thank you for sharing that. What you're experiencing sounds meaningful.",
-      source: 'Fallback',
-      isAI: false
-    };
-  }
-  
-  ConversationThread.add('reflection', result.text, { source: result.source });
-  
-  if (reflectionSnapshots[reflectionNum]) {
-    reflectionSnapshots[reflectionNum].continuedThoughts.push(`[AI]: ${result.text}`);
+    function renderChatBubbles() {
+      const container = document.getElementById('chatBubbles');
+      const entries = ConversationThread.getHistory();
+      
+      container.innerHTML = entries.map((entry, idx) => {
+        if (entry.type === 'user') {
+          return `
+            <div class="reflection-bubble user-bubble">
+              <div class="reflection-text">${entry.content}</div>
+              <div class="reflection-meta">
+                <span class="meta-tag">You</span>
+                <span class="meta-tag">${entry.time}</span>
+              </div>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="reflection-bubble" data-reflection-idx="${idx}">
+              <div class="reflection-text">${entry.content}</div>
+              <div class="reflection-meta">
+                <span class="meta-tag">E2: ${entry.e2Value || '--'} pg/mL</span>
+                <span class="meta-tag">${entry.category || '--'}</span>
+                <span class="meta-tag">${entry.trend || '--'}</span>
+                <span class="meta-tag">Phase: ${entry.phase || '--'}</span>
+              </div>
+              <div class="reflection-feedback">
+                <span class="feedback-label">Was this helpful?</span>
+                <button class="feedback-btn thumbs-up" onclick="handleFeedback(${ConversationThread.currentReflectionNum}, true, ${idx})">
+                  👍 Yes
+                </button>
+                <button class="feedback-btn thumbs-down" onclick="handleFeedback(${ConversationThread.currentReflectionNum}, false, ${idx})">
+                  👎 Not really
+                </button>
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+      
+      const replyContainer = document.getElementById('replyContainer');
+      if (entries.length > 0) {
+        replyContainer.style.display = 'block';
+      } else {
+        replyContainer.style.display = 'none';
+      }
+    }
     
-    sendReflectionData(
-      reflectionNum, 
-      reflectionSnapshots[reflectionNum].aiResponse, 
-      reflectionSnapshots[reflectionNum],
-      reflectionSnapshots[reflectionNum].continuedThoughts
-    );
-  }
-  
-  updateSessionPanel();
-  
-  currentReflectionId++;
-  renderChatBubble(result, context, reflectionNum, currentReflectionId);
-  
-  sendBtn.disabled = false;
-  sendBtn.textContent = 'Send';
-}
-    // ============================================
-    // UI STATE & EVENT HANDLERS
-    // ============================================
+    function handleFeedback(reflectionNum, isPositive, entryIdx) {
+      const bubble = document.querySelector(`[data-reflection-idx="${entryIdx}"]`);
+      if (!bubble) return;
+      
+      const buttons = bubble.querySelectorAll('.feedback-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      
+      const clickedBtn = bubble.querySelector(isPositive ? '.thumbs-up' : '.thumbs-down');
+      clickedBtn.classList.add('active');
+      
+      if (isPositive) {
+        resonanceData.resonates++;
+      } else {
+        resonanceData.doesntResonate++;
+      }
+      
+      resonanceData.history.push({
+        timestamp: new Date().toISOString(),
+        resonated: isPositive,
+        reflectionIndex: reflectionNum
+      });
+      
+      if (reflectionSnapshots[reflectionNum]) {
+        reflectionSnapshots[reflectionNum].resonated = isPositive ? 'yes' : 'no';
+        sendReflectionData(
+          reflectionNum,
+          reflectionSnapshots[reflectionNum].aiResponse,
+          reflectionSnapshots[reflectionNum],
+          reflectionSnapshots[reflectionNum].continuedThoughts,
+          true
+        );
+      }
+      
+      console.log('Feedback tracked for reflection', reflectionNum, ':', isPositive);
+    }
+    
+    async function sendReply() {
+      const input = document.getElementById('replyInput');
+      const userResponse = input.value.trim();
+      
+      if (!userResponse) return;
+      
+      const btn = document.getElementById('replyBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></span>';
+      
+      ConversationThread.add('user', userResponse);
+      
+      const reflectionNum = ConversationThread.currentReflectionNum;
+      if (reflectionSnapshots[reflectionNum]) {
+        reflectionSnapshots[reflectionNum].continuedThoughts.push(userResponse);
+      }
+      
+      renderChatBubbles();
+      
+      input.value = '';
+      input.style.height = 'auto';
+      
+      const context = getCurrentContext();
+      let result = await generateAIReflection(context, true, userResponse);
+      
+      if (!result) {
+        result = {
+          text: "Thank you for sharing that. What you're experiencing sounds meaningful.",
+          source: 'Fallback',
+          isAI: false
+        };
+      }
+      
+      ConversationThread.add('reflection', result.text, {
+        source: result.source,
+        e2Value: context.features.value.toFixed(0),
+        category: context.features.category,
+        trend: context.features.trend,
+        phase: context.cyclePhase
+      });
+      
+      if (reflectionSnapshots[reflectionNum]) {
+        reflectionSnapshots[reflectionNum].continuedThoughts.push(`[AI]: ${result.text}`);
+        sendReflectionData(
+          reflectionNum,
+          reflectionSnapshots[reflectionNum].aiResponse,
+          reflectionSnapshots[reflectionNum],
+          reflectionSnapshots[reflectionNum].continuedThoughts
+        );
+      }
+      
+      updateSessionPanel();
+      renderChatBubbles();
+      
+      btn.disabled = false;
+      btn.textContent = 'Send';
+      
+      setTimeout(() => {
+        const lastBubble = document.querySelector('#chatBubbles .reflection-bubble:last-child');
+        if (lastBubble) {
+          lastBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 100);
+    }
+    
     let currentFeatures = null;
     let selectedMoods = [];
-
-    // Collapsible session history
+    
     document.getElementById('sessionToggle').addEventListener('click', () => {
       const panel = document.getElementById('sessionPanel');
       const toggle = document.querySelector('.session-toggle');
@@ -1746,7 +1053,7 @@ async function sendChatResponse(reflectionNum, bubbleId) {
         toggle.textContent = '▲ Hide';
       }
     });
-    // Cycle phase selection
+    
     document.getElementById('cycleOptions').addEventListener('click', (e) => {
       const option = e.target.closest('.cycle-option');
       if (!option) return;
@@ -1763,18 +1070,15 @@ async function sendChatResponse(reflectionNum, bubbleId) {
       
       document.getElementById('cycleContext').innerHTML = CYCLE_CONTEXTS[currentCyclePhase].description;
       
-      // Track cycle phase change
       if (previousPhase !== currentCyclePhase) {
         Analytics.trackCyclePhaseChange(currentCyclePhase);
       }
     });
-
-    // E2 updates
+    
     E2Simulator.onUpdate(series => {
       currentFeatures = extractFeatures(series, E2Simulator.baseline);
       document.getElementById('e2Value').textContent = currentFeatures.value.toFixed(0);
       
-      // Track E2 values
       Analytics.trackE2(currentFeatures.value);
       
       const catEl = document.getElementById('e2Category');
@@ -1784,14 +1088,12 @@ async function sendChatResponse(reflectionNum, bubbleId) {
       document.getElementById('e2Trend').textContent = currentFeatures.trend;
       drawChart(series, E2Simulator.baseline);
     });
-
-    // Simulator toggle
+    
     document.getElementById('toggleSimulator').addEventListener('click', (e) => {
       const running = E2Simulator.toggle();
       e.target.textContent = running ? 'Pause' : 'Resume';
     });
-
-    // Mood chips - multi-select
+    
     document.getElementById('moodChips').addEventListener('click', (e) => {
       if (e.target.classList.contains('mood-chip')) {
         const mood = e.target.dataset.mood;
@@ -1805,59 +1107,10 @@ async function sendChatResponse(reflectionNum, bubbleId) {
         }
       }
     });
-
-    // Reflection limit
+    
     const MAX_REFLECTIONS = 5;
     let reflectionsUsed = 0;
     
-    function updateReflectionCounter() {
-      const remaining = MAX_REFLECTIONS - reflectionsUsed;
-      const counter = document.getElementById('reflectionCounter');
-      const btn = document.getElementById('generateBtn');
-      const limitDiv = document.querySelector('.reflection-limit');
-      
-      if (remaining <= 0) {
-        counter.textContent = 'No reflections remaining';
-        limitDiv.classList.add('depleted');
-        limitDiv.classList.remove('warning');
-        btn.disabled = true;
-        btn.textContent = 'Limit Reached';
-      } else if (remaining <= 2) {
-        counter.textContent = `${remaining} reflection${remaining === 1 ? '' : 's'} remaining`;
-        limitDiv.classList.add('warning');
-        limitDiv.classList.remove('depleted');
-      } else {
-        counter.textContent = `${remaining} reflections remaining`;
-        limitDiv.classList.remove('warning', 'depleted');
-      }
-      
-      // Update reminder
-      const reminder = document.getElementById('reflectionReminder');
-      const reminderCount = document.getElementById('reminderCount');
-      
-      if (remaining > 0 && remaining < MAX_REFLECTIONS) {
-        reminder.classList.remove('hidden');
-        reminderCount.textContent = remaining;
-      } else {
-        reminder.classList.add('hidden');
-      }
-    }
-    
-    // Scroll to reflect section
-    function scrollToReflect() {
-      const reflectSection = document.getElementById('ai-reflection');
-      if (reflectSection) {
-        reflectSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
-
-    // Session tracking
-    const sessionData = {
-      startTime: new Date().toISOString(),
-      prolificPid: prolificPid || null
-    };
-
-    // Update session panel
     function updateSessionPanel() {
       const entries = ConversationThread.getHistory();
       const reflectionCount = entries.filter(e => e.type === 'reflection').length;
@@ -1870,7 +1123,7 @@ async function sendChatResponse(reflectionNum, bubbleId) {
         return;
       }
       
-      list.innerHTML = entries.map((entry, i) => {
+      list.innerHTML = entries.map((entry) => {
         if (entry.type === 'user') {
           return `
             <div class="session-item user-entry">
@@ -1894,13 +1147,11 @@ async function sendChatResponse(reflectionNum, bubbleId) {
         }
       }).join('');
     }
-
-    // RAF info toggle
+    
     document.getElementById('rafInfoBtn').addEventListener('click', () => {
       document.getElementById('rafPanel').classList.toggle('visible');
     });
-
-    // Get current self-report state
+    
     function getCurrentSelfReport() {
       return {
         energy: parseInt(document.getElementById('energySlider').value),
@@ -1909,8 +1160,7 @@ async function sendChatResponse(reflectionNum, bubbleId) {
         selectedMoods: selectedMoods.length > 0 ? selectedMoods : []
       };
     }
-
-    // Get current context
+    
     function getCurrentContext() {
       return {
         features: currentFeatures,
@@ -1918,330 +1168,193 @@ async function sendChatResponse(reflectionNum, bubbleId) {
         cyclePhase: currentCyclePhase
       };
     }
-
-    // Generate reflection
-    // ============================================
-
-  document.getElementById('generateBtn').addEventListener('click', async () => {
-    if (!currentFeatures) return;
     
-  // Check limit and show modal instead
-  if (reflectionsUsed >= MAX_REFLECTIONS) {
-    document.getElementById('limitModal').classList.add('visible');
-    return;
-  }
-  
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="loading"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></span>';
-  
-  const context = getCurrentContext();
-  
-  if (ConversationThread.hasContextChanged(context) && ConversationThread.getHistory().length > 0) {
-    console.log('Context changed - starting fresh conversation thread');
-    ConversationThread.clear();
-  }
-  
-  Analytics.trackSelfReportChange(context.selfReport);
-  Analytics.captureSelfReport(
-    context.selfReport, 
-    context.cyclePhase, 
-    context.features ? context.features.value : null,
-    reflectionsUsed + 1
-  );
-  
-  let result = await generateAIReflection(context, false, null);
-  
-  if (!result) {
-    Analytics.trackError('AI generation failed');
-    const threadContainer = document.getElementById('conversationThread');
-    threadContainer.innerHTML += `
-      <div class="error-message">
-        Unable to connect to AI. Please check your connection and try again.
-      </div>
-    `;
-    btn.disabled = false;
-    btn.textContent = 'Try Again';
-    return;
-  }
-  
-  Analytics.trackFirstReflection();
-  
-  ConversationThread.add('reflection', result.text, { source: result.source });
-  ConversationThread.setLastContext(context);
-  
-  updateSessionPanel();
-  reflectionsUsed++;
-  currentReflectionId++;
-  
-  reflectionSnapshots[reflectionsUsed] = {
-    cyclePhase: context.cyclePhase,
-    energy: context.selfReport.energy,
-    stress: context.selfReport.stress,
-    selectedMoods: [...context.selfReport.selectedMoods],
-    journal: context.selfReport.journal,
-    e2Value: context.features ? context.features.value.toFixed(0) : '',
-    e2Trend: context.features ? context.features.trend : '',
-    aiResponse: result.text,
-    continuedThoughts: [],
-    resonated: ''
-  };
-  
-  sendReflectionData(reflectionsUsed, result.text, reflectionSnapshots[reflectionsUsed]);
-  
-  // Render in chat style
-  renderChatBubble(result, context, reflectionsUsed, currentReflectionId);
-  
-  // Check if limit reached
-  if (reflectionsUsed >= MAX_REFLECTIONS) {
-    btn.disabled = true;
-    btn.textContent = 'Limit Reached';
-    setTimeout(() => {
-      document.getElementById('limitModal').classList.add('visible');
-    }, 500);
-  } else {
-    btn.disabled = false;
-    btn.textContent = 'Generate New Reflection';
-  }
-});
-    // Render reflection card with continue conversation UI
-    function renderReflectionCard(result, context, reflectionNum) {
-      // Use passed reflectionNum, or fall back to current reflectionsUsed
-      const currentReflectionNum = reflectionNum || reflectionsUsed;
-      const threadHTML = ConversationThread.render();
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+      if (!currentFeatures) return;
       
-      document.getElementById('reflectionContainer').innerHTML = `
-        <div class="reflection-card" data-reflection-num="${currentReflectionNum}">
-          <div class="reflection-header">
-            <div>
-              <span class="reflection-label">Reflection</span>
-              <span class="reflection-source">${result.source}</span>
-            </div>
-            <button class="dismiss-btn" onclick="Analytics.trackDismissal(); this.closest('.reflection-card').remove()">×</button>
-          </div>
-          
-          ${threadHTML}
-          
-          <div class="reflection-meta">
-            <span class="meta-tag">E2: ${context.features.value.toFixed(0)} pg/mL</span>
-            <span class="meta-tag">${context.features.category}</span>
-            <span class="meta-tag">${context.features.trend}</span>
-            <span class="meta-tag">Phase: ${context.cyclePhase}</span>
-          </div>
-          
-          <div class="reflection-response">
-            <div class="response-buttons">
-              <button class="response-btn resonates" onclick="handleResonance(this, true, ${currentReflectionNum})">👍 This resonates</button>
-              <button class="response-btn doesnt-resonate" onclick="handleResonance(this, false, ${currentReflectionNum})">👎 Doesn't resonate</button>
-            </div>
-            
-            <!-- CONTINUE CONVERSATION -->
-            <div class="continue-conversation">
-              <div class="continue-label">Continue the conversation</div>
-              <div class="continue-sublabel">Respond to ANIMA's question, or share whatever comes up. The AI will respond to what you write.</div>
-              <textarea id="continueInput" class="continue-input" placeholder="What comes up for you..."></textarea>
-              <button id="continueBtn" class="continue-btn" onclick="continueConversation(${currentReflectionNum})">Continue →</button>
-            </div>
-          </div>
-          
-          <p class="reflection-disclaimer">This reflection is not advice or diagnosis—it offers one possible lens on your current moment.</p>
-        </div>
-      `;
-      
-      // Scroll thread to bottom
-      setTimeout(() => {
-        const thread = document.querySelector('.conversation-thread');
-        if (thread) thread.scrollTop = thread.scrollHeight;
-      }, 100);
-    }
-
-    // Continue conversation - THE CRITICAL FUNCTION
-    async function continueConversation(reflectionNum) {
-      const input = document.getElementById('continueInput');
-      const userResponse = input.value.trim();
-      
-      if (!userResponse) return;
-      
-      // Use passed reflectionNum, or fall back to current reflectionsUsed
-      const targetReflection = reflectionNum || reflectionsUsed;
-      
-      const btn = document.getElementById('continueBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="loading"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></span>';
-      
-      // Add user response to conversation thread FIRST
-      ConversationThread.add('user', userResponse);
-      
-      // Track this continued thought for the target reflection
-      if (reflectionSnapshots[targetReflection]) {
-        reflectionSnapshots[targetReflection].continuedThoughts.push(userResponse);
+      if (reflectionsUsed >= MAX_REFLECTIONS) {
+        document.getElementById('limitModal').classList.add('visible');
+        return;
       }
-      
-      const context = getCurrentContext();
-      
-      // Generate AI response with isFollowUp=true and the EXACT user response
-      let result = await generateAIReflection(context, true, userResponse);
-      
-      if (!result) {
-        // Fallback message
-        result = {
-          text: "Thank you for sharing that. What you're experiencing sounds meaningful.",
-          source: 'Fallback',
-          isAI: false
-        };
-      }
-      
-      // Add AI response to thread and track it
-      ConversationThread.add('reflection', result.text, { source: result.source });
-      
-      // Add the AI follow-up response to continued thoughts too
-      if (reflectionSnapshots[targetReflection]) {
-        reflectionSnapshots[targetReflection].continuedThoughts.push(`[AI]: ${result.text}`);
-        
-        // Send updated data with continued thoughts
-        sendReflectionData(
-          targetReflection, 
-          reflectionSnapshots[targetReflection].aiResponse, 
-          reflectionSnapshots[targetReflection],
-          reflectionSnapshots[targetReflection].continuedThoughts
-        );
-      }
-      
-      updateSessionPanel();
-      
-      // Re-render the card with updated thread - pass the same reflection number
-      renderReflectionCard(result, context, targetReflection);
-      
-      btn.disabled = false;
-      btn.textContent = 'Continue →';
-    }
-
-    // Resonance tracking data
-    const resonanceData = {
-      resonates: 0,
-      doesntResonate: 0,
-      history: []
-    };
-
-    // Handle resonance feedback
-    function handleResonance(btn, didResonate, reflectionNum) {
-      btn.parentElement.querySelectorAll('.response-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      // Use passed reflectionNum, or fall back to current reflectionsUsed
-      const targetReflection = reflectionNum || reflectionsUsed;
-      
-      // Track the feedback
-      if (didResonate) {
-        resonanceData.resonates++;
-      } else {
-        resonanceData.doesntResonate++;
-      }
-      
-      resonanceData.history.push({
-        timestamp: new Date().toISOString(),
-        resonated: didResonate,
-        reflectionIndex: targetReflection
-      });
-      
-      // Update the reflection snapshot with resonance
-      if (reflectionSnapshots[targetReflection]) {
-        reflectionSnapshots[targetReflection].resonated = didResonate ? 'yes' : 'no';
-        
-        // Send updated data with resonance (forceUpdate = true to ensure it sends)
-        sendReflectionData(
-          targetReflection, 
-          reflectionSnapshots[targetReflection].aiResponse, 
-          reflectionSnapshots[targetReflection],
-          reflectionSnapshots[targetReflection].continuedThoughts,
-          true  // forceUpdate - always send resonance updates
-        );
-      }
-      
-      console.log('Resonance tracked for reflection', targetReflection, ':', resonanceData);
-      
-      // If doesn't resonate and still have reflections, offer to regenerate
-      if (!didResonate && reflectionsUsed < MAX_REFLECTIONS) {
-        const responseDiv = btn.closest('.reflection-response');
-        if (responseDiv) {
-          const existingRegen = responseDiv.querySelector('.regenerate-prompt');
-          if (!existingRegen) {
-            const regenPrompt = document.createElement('div');
-            regenPrompt.className = 'regenerate-prompt';
-            regenPrompt.innerHTML = `
-              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 12px 0 8px;">Would you like to try a different reflection?</p>
-              <button class="btn-secondary" onclick="regenerateReflection()" style="padding: 8px 16px; font-size: 0.8rem;">Try Again</button>
-            `;
-            responseDiv.insertBefore(regenPrompt, responseDiv.querySelector('.continue-conversation'));
-          }
-        }
-      }
-    }
-    
-    // Regenerate reflection (uses a reflection credit)
-    async function regenerateReflection() {
-      if (reflectionsUsed >= MAX_REFLECTIONS) return;
-      
-      // Track regeneration
-      Analytics.trackRegenerate();
       
       const btn = document.getElementById('generateBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="loading"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></span>';
       
-      // Get FRESH context
       const context = getCurrentContext();
+      
+      if (ConversationThread.hasContextChanged(context) && ConversationThread.getHistory().length > 0) {
+        console.log('Context changed - moving old chat to session history');
+        updateSessionPanel();
+        ConversationThread.clear();
+      }
+      
+      Analytics.trackSelfReportChange(context.selfReport);
+      Analytics.captureSelfReport(
+        context.selfReport,
+        context.cyclePhase,
+        context.features ? context.features.value : null,
+        reflectionsUsed + 1
+      );
       
       let result = await generateAIReflection(context, false, null);
       
-      if (result) {
-        Analytics.trackFirstReflection(); // Track timing
-        ConversationThread.add('reflection', result.text, { source: result.source });
-        updateSessionPanel();
-        reflectionsUsed++;
-        updateReflectionCounter();
-        
-        // Create snapshot for this regenerated reflection (same as regular reflection)
-        reflectionSnapshots[reflectionsUsed] = {
-          cyclePhase: context.cyclePhase,
-          energy: context.selfReport.energy,
-          stress: context.selfReport.stress,
-          selectedMoods: [...context.selfReport.selectedMoods],
-          journal: context.selfReport.journal,
-          e2Value: context.features ? context.features.value.toFixed(0) : '',
-          e2Trend: context.features ? context.features.trend : '',
-          aiResponse: result.text,
-          continuedThoughts: [],
-          resonated: '',
-          wasRegenerated: true  // Flag that this came from "Try Again"
-        };
-        
-        // Send data for this regenerated reflection
-        sendReflectionData(reflectionsUsed, result.text, reflectionSnapshots[reflectionsUsed]);
-        
-        // Render with correct reflection number
-        renderReflectionCard(result, context, reflectionsUsed);
+      if (!result) {
+        Analytics.trackError('AI generation failed');
+        document.getElementById('chatBubbles').innerHTML += `
+          <div class="error-message">
+            Unable to connect to AI. Please check your connection and try again.
+          </div>
+        `;
+        btn.disabled = false;
+        btn.textContent = 'Try Again';
+        return;
       }
       
-      btn.disabled = false;
-      btn.textContent = 'Generate New Reflection';
+      Analytics.trackFirstReflection();
+      
+      reflectionsUsed++;
+      ConversationThread.currentReflectionNum = reflectionsUsed;
+      
+      ConversationThread.add('reflection', result.text, {
+        source: result.source,
+        e2Value: context.features.value.toFixed(0),
+        category: context.features.category,
+        trend: context.features.trend,
+        phase: context.cyclePhase
+      });
+      ConversationThread.setLastContext(context);
+      
+      updateSessionPanel();
+      
+      reflectionSnapshots[reflectionsUsed] = {
+        cyclePhase: context.cyclePhase,
+        energy: context.selfReport.energy,
+        stress: context.selfReport.stress,
+        selectedMoods: [...context.selfReport.selectedMoods],
+        journal: context.selfReport.journal,
+        e2Value: context.features ? context.features.value.toFixed(0) : '',
+        e2Trend: context.features ? context.features.trend : '',
+        aiResponse: result.text,
+        continuedThoughts: [],
+        resonated: ''
+      };
+      
+      sendReflectionData(reflectionsUsed, result.text, reflectionSnapshots[reflectionsUsed]);
+      
+      renderChatBubbles();
+      
+      if (reflectionsUsed >= MAX_REFLECTIONS) {
+        btn.disabled = true;
+        btn.textContent = 'Limit Reached';
+        setTimeout(() => {
+          document.getElementById('limitModal').classList.add('visible');
+        }, 500);
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Generate New Reflection';
+      }
+    });
+    
+    const resonanceData = {
+      resonates: 0,
+      doesntResonate: 0,
+      history: []
+    };
+    
+    document.getElementById('replyInput').addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
+    
+    document.getElementById('replyBtn').addEventListener('click', sendReply);
+    
+    document.getElementById('replyInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendReply();
+      }
+    });
+    
+    const completeBtn = document.getElementById("completeBtn");
+    if (completeBtn) {
+      completeBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        if (Analytics.dataSubmitted) {
+          if (prolificPid) {
+            window.location.href = `https://mit.co1.qualtrics.com/jfe/form/SV_0JuC9TggUE1uHnU?PROLIFIC_PID=${encodeURIComponent(prolificPid)}`;
+          } else {
+            window.location.href = 'https://mit.co1.qualtrics.com/jfe/form/SV_0JuC9TggUE1uHnU';
+          }
+          return;
+        }
+        Analytics.dataSubmitted = true;
+        
+        const deviceInfo = getDeviceInfo();
+        const selfReport = getCurrentSelfReport();
+        const conversationHistory = ConversationThread.getHistory();
+        
+        const data = {
+          visitorId: visitorId,
+          prolificPid: (prolificPid && prolificPid.length > 0) ? prolificPid : visitorId,
+          sessionDuration: Analytics.getSessionDuration(),
+          cyclePhase: currentCyclePhase,
+          energyLevel: selfReport.energy,
+          stressLevel: selfReport.stress,
+          selectedMoods: selfReport.selectedMoods.join(', '),
+          journalEntry: selfReport.journal,
+          reflectionsGenerated: reflectionsUsed,
+          resonatesCount: resonanceData.resonates,
+          doesntResonateCount: resonanceData.doesntResonate,
+          regenerateCount: Analytics.regenerateCount,
+          conversationContinues: conversationHistory.filter(e => e.type === 'user').length,
+          e2ValueFirst: Analytics.e2ValueFirst ? Analytics.e2ValueFirst.toFixed(0) : '',
+          e2ValueLast: Analytics.e2ValueLast ? Analytics.e2ValueLast.toFixed(0) : '',
+          e2Trend: currentFeatures ? currentFeatures.trend : '',
+          allReflectionTexts: conversationHistory.filter(e => e.type === 'reflection').map(e => e.content),
+          allUserResponses: conversationHistory.filter(e => e.type === 'user').map(e => e.content),
+          resonanceHistory: resonanceData.history,
+          fullConversationThread: conversationHistory,
+          timeToFirstReflection: Analytics.getTimeToFirstReflection(),
+          avgTimeBetweenReflections: Analytics.getAvgTimeBetweenReflections(),
+          cyclePhaseChanges: Analytics.cyclePhaseChanges,
+          selfReportChanges: Analytics.selfReportChanges,
+          journalWordCount: selfReport.journal ? selfReport.journal.split(/\s+/).filter(w => w).length : 0,
+          userResponseWordCounts: conversationHistory.filter(e => e.type === 'user').map(e => e.content.split(/\s+/).filter(w => w).length),
+          deviceType: deviceInfo.deviceType,
+          screenWidth: deviceInfo.screenWidth,
+          browserType: deviceInfo.browser,
+          errorsEncountered: Analytics.errorsEncountered,
+          completedSession: true,
+          selfReportHistory: Analytics.selfReportHistory,
+          cyclePhaseHistory: Analytics.cyclePhaseHistory,
+          e2History: Analytics.e2History
+        };
+        
+        fetch(GOOGLE_SHEETS_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        }).then(() => {
+          console.log('Data sent to Google Sheets');
+        }).catch(err => {
+          console.error('Fetch error:', err);
+        });
+        
+        setTimeout(() => {
+          if (prolificPid) {
+            window.location.href = `https://mit.co1.qualtrics.com/jfe/form/SV_0JuC9TggUE1uHnU?PROLIFIC_PID=${encodeURIComponent(prolificPid)}`;
+          } else {
+            window.location.href = 'https://mit.co1.qualtrics.com/jfe/form/SV_0JuC9TggUE1uHnU';
+          }
+        }, 300);
+      });
     }
     
-    // Handle sit with this (removed - replaced with doesn't resonate)
-    function handleSitWith(btn) {
-      btn.closest('.reflection-card').classList.add('sitting');
-      setTimeout(() => {
-        const card = document.querySelector('.reflection-card');
-        if (card) card.remove();
-      }, 1500);
-    }
-
-    // Start
     E2Simulator.start();
     updateSessionPanel();
-    
-    // Data is ONLY sent when user clicks "Complete Session"
-    // No automatic beforeunload sending - this prevents duplicate rows
   </script>
 </body>
 </html>
