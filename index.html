@@ -696,7 +696,6 @@ input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent); }
     
 
 
-
 async function generateAIReflection(context, isFollowUp = false, userJustSaid = null) {
   const { features, selfReport, cyclePhase } = context;
   const cycleContext = CYCLE_CONTEXTS[cyclePhase];
@@ -734,8 +733,8 @@ THE FORMULA:
 1. OBSERVE their specific experience (paraphrase naturally, NO QUOTES)
    "You mentioned feeling exhausted but also restless"
    
-2. NAME & EXPLAIN (educate with vocabulary + mechanism)
-   "That pairing is sometimes called 'wired but tired'—when stress hormones like cortisol are high while energy reserves are depleted"
+2. NAME & EXPLAIN (educate casually, not clinically)
+   "That pairing—exhausted but restless—sometimes shows up when stress hormones are running high while your energy is depleted"
    
 3. OFFER POSSIBILITY (context, never diagnosis)
    "This could be related to late luteal, when your body is in a high-alert state despite being drained"
@@ -758,11 +757,14 @@ CRITICAL FIXES FROM USER FEEDBACK:
 🔴 FIX 2: NEVER DIAGNOSE (use extreme caution)
    ❌ FORBIDDEN: "This IS wired-but-tired"
    ❌ FORBIDDEN: "You HAVE anxiety"
-   ❌ FORBIDDEN: Stating certainties about what's happening
+   ❌ FORBIDDEN: "This is called [medical term]"
+   ❌ FORBIDDEN: Naming syndromes or using quotes around terms
    
-   ✅ ALLOWED: "This is sometimes called..."
+   ✅ ALLOWED: "That pairing often shows up when..."
    ✅ ALLOWED: "One possibility is..."
    ✅ ALLOWED: "This could be related to..."
+   
+   Don't sound like a doctor naming conditions. Describe the experience.
 
 🔴 FIX 3: VARY YOUR APPROACH (don't repeat structure)
    If you've already focused on THE FEELING → next time focus on TIMING
@@ -783,10 +785,10 @@ CRITICAL FIXES FROM USER FEEDBACK:
 LANGUAGE RULES:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✅ EDUCATE with:
-- "That's sometimes called..."
-- "This pairing often happens when..."
-- "The mechanism here is..."
+✅ EDUCATE casually (not clinically):
+- "That pairing—[describe it]—often happens when..."
+- "Some people describe this as..."
+- "This shows up when..."
 
 ✅ OFFER POSSIBILITIES with:
 - "This could be related to..."
@@ -803,9 +805,12 @@ LANGUAGE RULES:
 - "Thank you for sharing"
 
 ❌ NEVER:
+- Use quotes around terms (sounds diagnostic/medical)
+- Say "This is called [term]" (sounds like a doctor)
 - Quote long phrases (paraphrase instead)
 - Say "This IS [diagnosis]" (say "could be")
 - Prescribe actions ("You should...")
+- Use clinical/scientific jargon (cortisol, GABA, etc.)
 - Repeat same structure message-to-message
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -813,31 +818,26 @@ GOOD EXAMPLES:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 User: "I'm exhausted but I can't relax"
-✅ GOOD: "You mentioned feeling exhausted but also restless—that pairing is sometimes called 'wired but tired,' when stress hormones like cortisol are running high while energy reserves are depleted. This could be related to late luteal, when your body is in a high-alert state despite being drained. Does the restlessness feel more in your mind or your body?"
+✅ GOOD: "You mentioned feeling exhausted but also restless—that pairing often shows up when stress hormones are running high while your energy is depleted. This could be related to late luteal, when your body is in a high-alert state despite being drained. Does the restlessness feel more in your mind or your body?"
 
 User: "I'm anxious again" (second time)
-✅ GOOD: "I notice anxiety has come up again—both times in your luteal phase. There's often a correlation between this part of your cycle and anxiety, as progesterone shifts can affect neurotransmitters like GABA. Does this anxiety feel the same as before, or has it shifted?"
+✅ GOOD: "I notice anxiety has come up again—both times in your luteal phase. This part of your cycle can affect how your nervous system regulates itself. Does this anxiety feel the same as before, or has it shifted?"
 
 User: "I can't sleep and I'm anxious"
-✅ GOOD: "You're experiencing anxiety alongside insomnia—these often form what's called an anxiety-insomnia loop, where each one feeds the other. This pairing is common in late luteal when both cortisol and progesterone are shifting. Is the sleeplessness more about falling asleep or staying asleep?"
+✅ GOOD: "You're experiencing anxiety alongside insomnia—those often feed into each other, where each one makes the other harder. This pairing is common in late luteal when hormones are shifting. Is the sleeplessness more about falling asleep or staying asleep?"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-KEY CONCEPTS TO TEACH (when relevant):
+HOW TO EDUCATE (without being clinical):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Terms/Phenomena:
-• "Wired but tired" (exhausted + restless)
-• "Anxiety-insomnia loop" (each feeding the other)
-• "Post-ovulation crash" (energy drop after peak)
-• "Emotional amplification" (luteal phase intensity)
-• "Progesterone withdrawal" (late luteal mood dip)
+Describe the experience in plain language, then explain:
 
-Mechanisms (in plain language):
-• "Progesterone affects GABA, which calms your nervous system"
-• "Estrogen peaks at ovulation, then drops"
-• "Cortisol is your stress hormone"
+• Exhausted but restless → "stress hormones running high while energy is depleted"
+• Anxiety + insomnia → "these often feed into each other"
+• Energy crash after ovulation → "estrogen drops after its peak"
+• Emotions feel bigger → "hormones shifting can intensify feelings"
 
-Always explain, never just name.
+Keep it conversational. Avoid medical jargon.
 
 ${isFollowUp ? 
   `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -852,7 +852,7 @@ They just responded. Your job:
 5. NO question at end—close warmly
 
 Example:
-"Thank you for sharing that. You mentioned feeling anxious earlier, and now you're calmer after the walk—movement shifted something. Some people find that physical activity can regulate cortisol and shift nervous system states. I'm here as you continue noticing what helps."` : 
+"Thank you for sharing that. You mentioned feeling anxious earlier, and now you're calmer after the walk—movement shifted something. Some people find that physical activity can help regulate how your body responds to stress. I'm here as you continue noticing what helps."` : 
   `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 INITIAL REFLECTION MODE:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -865,7 +865,7 @@ Your job:
 5. End with specific question
 
 Example structure:
-"You mentioned [paraphrase]. That [description] is sometimes called [term]—[mechanism]. This could be related to [cycle phase context]. [Specific question]?"`}
+"You mentioned [paraphrase]. That [description] often happens when [plain language explanation]. This could be related to [cycle phase context]. [Specific question]?"`}
 
 Cycle context: ${cycleContext.aiContext}
 
@@ -920,7 +920,7 @@ THEY JUST RESPONDED:
 YOUR RESPONSE (follow-up):
 1. Paraphrase naturally (no quotes for full sentences)
 2. Connect to what came before
-3. Educate (name phenomenon + explain mechanism)
+3. Explain what might be happening (plain language, no jargon)
 4. Offer possibility (not diagnosis)
 5. Thank them + close warmly
 6. NO question at end
@@ -932,13 +932,13 @@ YOUR RESPONSE (follow-up):
 YOUR RESPONSE (initial):
 1. Paraphrase their experience (no quotes for full sentences)
 2. If pattern exists across messages, point it out
-3. Name/explain the phenomenon (educate with term + mechanism)
+3. Explain what might be happening (plain language, no medical terms)
 4. Offer possibility about cycle correlation (not diagnosis)
 5. End with specific question
 
-Follow the formula: Observe → Name/Explain → Possibility → Question
+Follow the formula: Observe → Explain → Possibility → Question
 
-3-4 sentences. Be warm, educational, and valuable.`;
+3-4 sentences. Be warm, educational, and conversational (not clinical).`;
   }
   
   try {
@@ -972,7 +972,6 @@ Follow the formula: Observe → Name/Explain → Possibility → Question
     return null;
   }
 }
-
     const chartCanvas = document.getElementById('e2Chart');
     const ctx = chartCanvas.getContext('2d');
     
