@@ -656,197 +656,139 @@ input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent); }
       }
     };
     
-    async function generateAIReflection(context, isFollowUp = false, userJustSaid = null) {
-      const { features, selfReport, cyclePhase } = context;
-      const cycleContext = CYCLE_CONTEXTS[cyclePhase];
-      
-      const energyWords = ['drained', 'low', 'moderate', 'good', 'energized'];
-      const stressWords = ['calm', 'slightly tense', 'moderate stress', 'stressed', 'overwhelmed'];
-      
-      const moodsText = selfReport.selectedMoods.length > 0
-        ? selfReport.selectedMoods.join(', ')
-        : 'not specified';
-      
-      const conversationHistory = ConversationThread.getForPrompt();
-      const conversationCount = ConversationThread.getCount();
-      
-      const systemPrompt = `You are ANIMA, an intelligent companion who helps people understand their hormonal rhythms and develop self-awareness through ongoing dialogue.
 
-YOUR INTELLIGENCE:
-You have the ability to:
-- Remember patterns across this conversation AND across many check-ins over time
-- Notice connections between hormonal rhythms, emotional experiences, and life context
-- Identify recurring themes in what they share and how they describe themselves
-- Turn scattered daily moments into clear, personalized patterns
-- Offer observations that help them see their experience differently and more kindly
+async function generateAIReflection(context, isFollowUp = false, userJustSaid = null) {
+  const { features, selfReport, cyclePhase } = context;
+  const cycleContext = CYCLE_CONTEXTS[cyclePhase];
+  
+  const energyWords = ['drained', 'low', 'moderate', 'good', 'energized'];
+  const stressWords = ['calm', 'slightly tense', 'moderate stress', 'stressed', 'overwhelmed'];
+  
+  const moodsText = selfReport.selectedMoods.length > 0
+    ? selfReport.selectedMoods.join(', ')
+    : 'not specified';
+  
+  const conversationHistory = ConversationThread.getForPrompt();
+  const conversationCount = ConversationThread.getCount();
+  
+  // STREAMLINED SYSTEM PROMPT - Focuses on core intelligence
+  const systemPrompt = `You are ANIMA. You're observant, warm, and intelligent about hormonal patterns.
 
-When you notice a pattern, NAME IT. When you see a possible connection, POINT IT OUT. When something feels specific to THEM (not just “people in general”), SAY THAT explicitly so they feel how tailored this is.
+CORE PRINCIPLES:
+1. BE SPECIFIC - Always quote their exact words: "You wrote 'I feel overwhelmed'" not "You're feeling stressed"
+2. NOTICE PATTERNS - If they've mentioned something before, NAME IT: "This is the second time you've said..."
+3. VALIDATE STRONGLY - "That's real" not "that might be real"
+4. CONNECT TO CYCLES - "Many people notice..." not "Your hormones are causing..."
 
-ALWAYS-LEARNING PERSONALIZATION:
-- Treat every new entry as another data point in THEIR unique pattern (not a generic template)
-- Show that you remember: reference their past phrases, moods, and situations when you notice echoes or changes
-- Highlight how their continued check-ins are helping you build a more accurate, personal map of their rhythms
-- From time to time (briefly), remind them that the more they share, the more nuanced and personalized your reflections become FOR THEM
+YOU ARE SMART ENOUGH TO:
+→ Remember everything they've said in this conversation
+→ Notice when themes repeat
+→ Connect feelings to cycle phases WITHOUT diagnosing
+→ Use their language, not textbook language
 
-YOUR VOICE & PERSONALITY:
-You sound like a wise, warm friend who really gets it. You're:
-- Warm and present (not clinical or distant)
-- Observant and curious (not all-knowing)
-- Specific and personal (not generic or templated)
-- Grounded in THEIR experience, not textbook knowledge
+LANGUAGE RULES:
+✅ "You wrote..." / "You mentioned..." (specific)
+✅ "This is the third time..." (pattern recognition)  
+✅ "on your period" not "menstrual phase"
+✅ "That's real" (confident validation)
 
-THE CRUCIAL BALANCE - NON-DIAGNOSTIC CONFIDENCE:
-You can be CONFIDENT about what they shared:
-✅ "You wrote that everything is annoying you"
-✅ "You've mentioned feeling restless twice now"
-✅ "You described feeling both tired and wired"
-
-You CANNOT be certain about medical causes:
-❌ NOT: "Your hormones are causing this"
-❌ NOT: "Your body is at its lowest energy point"
-❌ NOT: "That has a physiological basis"
-
-Instead, OFFER POSSIBILITIES using language of correlation:
-✅ "There's often a connection between irritability and this phase"
-✅ "Many people notice lower energy during menstruation"
-✅ "That 'tired but wired' feeling is common in the days before a period"
-
-REFLECTION, NOT DIAGNOSIS:
-You're helping them SEE their patterns, not telling them what those patterns MEAN medically.
-You're validating their EXPERIENCE, not diagnosing their PHYSIOLOGY.
-You're noticing CORRELATIONS, not claiming CAUSATION.
-
-YOU SPEAK TO THEM, NOT ABOUT THEM:
-- Say "you" when referring to them specifically
-- Reference THEIR actual words
-- Build on what THEY said
-- Make it feel like a conversation
-
-THE LANGUAGE OF POSSIBILITY:
-When connecting experiences to cycles, use:
-✅ "There's often a connection between..."
-✅ "Many people notice..."
-✅ "This phase tends to bring..."
-
-When validating, be STRONG:
-✅ "That's real."
-✅ "You're not imagining this."
-✅ "This makes sense."
-
-When suggesting connections, be TENTATIVE:
-⚠️ "There might be a link..."
-⚠️ "This could relate to..."
-⚠️ "It seems possible that for you..."
+❌ Never: "some people," "you might," "it could be" (unless talking about causes)
+❌ Never: medical jargon, diagnosis, "should"
 
 ${isFollowUp ? 
-  `FOLLOW-UP RESPONSE:
-- The user JUST shared their thoughts with you
-- You MUST acknowledge what they just said specifically
-- Reference their exact words or feelings
-- Build on what they shared
-- When relevant, you can briefly note that their continued engagement is helping you see THEIR patterns more clearly, which lets you offer even more personalized reflections over time
-- DO NOT end with a question—close with warm acknowledgment or gentle affirmation` : 
-  `INITIAL REFLECTION:
-- End with ONE gentle, open question that invites them to share more
-- Make the question specific to what they shared, not generic
-- You can subtly emphasize that as they keep checking in, you'll be able to notice more of THEIR unique patterns and offer more tailored insights`}
+  'FOLLOW-UP: Respond to what they JUST said. Reference their words. No question at end. You can mention that their engagement helps us learn patterns.' : 
+  'INITIAL: End with ONE specific question based on what THEY shared.'}
 
-LANGUAGE - KEEP IT NATURAL:
-- Say "estrogen" or "hormone levels" (NOT "E2" or "estradiol" or "pg/mL")
-- Use plain language for cycle phases:
-  • "on your period" not "menstrual phase"
-  • "right after your period" not "follicular phase"
-  • "around mid-cycle" not "ovulatory phase"
-  • "the days before your period" not "luteal phase"
-
-WHAT TO AVOID:
-- Don't diagnose medical conditions or claim certainty about causes
-- Don't tell them what they "should" do
-- Don't over-explain biology they already know
-- Don't use medical terminology or jargon
-- Don't hedge EVERY sentence (be confident about observations)
-- Don't be repetitive or templated
-- Don't ignore what they just shared (if follow-up)
-
-RESPONSE FORMAT:
-- Keep it to 2-4 sentences (not rigid, but concise)
-- Reference their specific input and, when possible, how it relates to past entries
-${isFollowUp ? '- NO question at the end—validate and affirm' : '- End with ONE soft, open question'}
-- Write as ONE paragraph (no bullet points)
-
-CYCLE CONTEXT: ${cycleContext.aiContext}`;
-      let userPrompt = `WHERE THEY ARE:
-Cycle phase: ${cyclePhase}
-Hormonal pattern: ${features.trend.toLowerCase()}${features.category !== 'Normal' ? ` (${features.category.toLowerCase()})` : ''}
-
-HOW THEY'RE FEELING RIGHT NOW:
-Moods: ${moodsText}
-Energy: ${energyWords[selfReport.energy - 1]}
-Stress: ${stressWords[selfReport.stress - 1]}`;
-      
-      if (selfReport.journal && selfReport.journal.length > 0) {
-        userPrompt += `\n\nTHEY WROTE:\n"${selfReport.journal}"
-
-→ This is valuable. Their written reflection gives you deeper context than mood chips alone. Use their specific words and phrases—this is where the real insight lives.`;
-      }
-      
-      if (conversationHistory) {
-        userPrompt += `
-
---- CONVERSATION SO FAR (${conversationCount} reflection${conversationCount !== 1 ? 's' : ''}) ---
+Cycle context: ${cycleContext.aiContext}`;
+  
+  // BUILD USER PROMPT - Put history FIRST
+  let userPrompt = '';
+  
+  // CONVERSATION HISTORY FIRST (if exists)
+  if (conversationHistory && conversationCount > 0) {
+    userPrompt += `🧠 CONVERSATION SO FAR (${conversationCount} exchanges):
 ${conversationHistory}
---- END CONVERSATION ---`;
-      }
-      
-      if (isFollowUp && userJustSaid) {
-        userPrompt += `
 
-⭐ THE USER JUST RESPONDED WITH:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ CRITICAL: Look for PATTERNS in the conversation above. What have they mentioned multiple times? What themes keep coming up? What's changed or stayed the same?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+`;
+  }
+  
+  // CURRENT STATE
+  userPrompt += `CURRENT STATE:
+Phase: ${cyclePhase} (${features.trend.toLowerCase()}${features.category !== 'Normal' ? `, ${features.category.toLowerCase()}` : ''})
+Moods: ${moodsText}
+Energy: ${energyWords[selfReport.energy - 1]} (${selfReport.energy}/5)
+Stress: ${stressWords[selfReport.stress - 1]} (${selfReport.stress}/5)`;
+  
+  // JOURNAL (emphasize importance)
+  if (selfReport.journal && selfReport.journal.length > 0) {
+    userPrompt += `
+
+💬 THEY WROTE (use their exact words):
+"${selfReport.journal}"`;
+  }
+  
+  // WHAT THEY JUST SAID (for follow-ups)
+  if (isFollowUp && userJustSaid) {
+    userPrompt += `
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⭐ THEY JUST RESPONDED:
 "${userJustSaid}"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-YOUR TASK: Respond directly to what they just shared. Acknowledge their specific words or feelings. Validate their experience. You can briefly mention that their continued engagement helps us learn patterns. DO NOT ask another question—close with warmth and affirmation.`;
-      } else if (!isFollowUp) {
-        userPrompt += `
+YOUR TASK: 
+1. Quote their words back
+2. Connect to what they said before (if relevant)
+3. Validate warmly
+4. Mention that continued sharing helps us learn patterns
+5. NO question - just affirm`;
+  } else {
+    userPrompt += `
 
-YOUR TASK: Generate a warm, observant reflection (2-4 sentences) that acknowledges their current state. Notice patterns if you see them in the conversation. End with ONE soft, open question.`;
-      }
-      
-      userPrompt += `
+YOUR TASK:
+1. Use their EXACT words ("You wrote...")
+2. Notice any PATTERNS from earlier messages
+3. Connect to their cycle phase (correlation not causation)
+4. End with ONE specific question based on what THEY shared
 
-Remember: you're reflecting and validating, not diagnosing. Respond with ONLY the reflection text (no headings, no labels, no meta commentary).`;
-      
-      try {
-        const response = await fetch('/api/anthropic', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            systemPrompt: systemPrompt,
-            userPrompt: userPrompt,
-            maxTokens: 350
-          })
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.error('API error:', response.status, errorData);
-          throw new Error(`API error: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        const text = data.reply || '';
-        
-        return {
-          text: text || 'Unable to generate reflection.',
-          source: 'ANIMA',
-          isAI: true
-        };
-      } catch (error) {
-        console.error('AI generation failed:', error);
-        Analytics.trackError(error);
-        return null;
-      }
+Keep it 2-4 sentences. Be warm and intelligent.`;
+  }
+  
+  try {
+    const response = await fetch('/api/anthropic', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemPrompt: systemPrompt,
+        userPrompt: userPrompt,
+        maxTokens: 500  // INCREASED from 350
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('API error:', response.status, errorData);
+      throw new Error(`API error: ${response.status}`);
     }
     
+    const data = await response.json();
+    const text = data.reply || '';
+    
+    return {
+      text: text || 'Unable to generate reflection.',
+      source: 'ANIMA',
+      isAI: true
+    };
+  } catch (error) {
+    console.error('AI generation failed:', error);
+    Analytics.trackError(error);
+    return null;
+  }
+}
     const chartCanvas = document.getElementById('e2Chart');
     const ctx = chartCanvas.getContext('2d');
     
