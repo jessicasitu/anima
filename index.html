@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ANIMA - AI Reflective Companion</title>
+  <title>ANIMA - AI Reflective Practice</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -51,7 +51,6 @@ body {
 .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-bold); }
 .section-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
-
 .practice-info { 
   margin-bottom: 28px; 
   padding: 20px; 
@@ -64,7 +63,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 12px; 
   cursor: pointer;
 }
 
@@ -84,6 +83,7 @@ body {
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--text-bold);
+  margin: 0;
 }
 
 .practice-arrow {
@@ -116,7 +116,7 @@ body {
 .practice-intro {
   font-size: 0.82rem;
   color: var(--text-muted);
-  margin-bottom: 16px;
+  margin-bottom: 16px; 
   line-height: 1.5;
 }
 
@@ -125,11 +125,12 @@ body {
   color: var(--text-bold);
 }
 
+
 .practice-comparison {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 16px;  
 }
 
 .comparison-card {
@@ -146,18 +147,21 @@ body {
   border-color: var(--border-hover);
 }
 
+
 .comparison-card h4 {
   font-size: 0.68rem;
   color: var(--text-muted);
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
+  margin-top: 0;
 }
+
 
 .comparison-card ul {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0; 
 }
 
 .comparison-card li {
@@ -167,20 +171,27 @@ body {
   margin-bottom: 4px;
 }
 
+.comparison-card li:last-child {
+  margin-bottom: 0; 
+}
+
+
 .practice-skills {
-  margin-top: 16px;
+  margin-top: 0; 
   padding: 14px;
   background: var(--bg-input);
   border-radius: 10px;
   font-size: 0.8rem;
   color: var(--text-secondary);
   line-height: 1.6;
+  margin-bottom: 16px; 
 }
 
-.practice-skills h4 {
+.practice-skills strong {
   font-size: 0.8rem;
   color: var(--text-bold);
   font-weight: 700;
+  display: block;
   margin-bottom: 10px;
 }
 
@@ -188,23 +199,28 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  margin: 0; 
 }
 
 .skill-item {
   font-size: 0.75rem;
   color: var(--text-secondary);
   line-height: 1.4;
+  margin: 0; 
 }
 
 .skill-item strong {
   color: var(--text-bold);
   font-weight: 700;
+  display: inline; 
+  margin: 0;
 }
 
 .practice-footer {
   font-size: 0.82rem;
   color: var(--text-muted);
-  margin-top: 16px;
+  margin-top: 0; 
+  margin-bottom: 0; 
   line-height: 1.5;
 }
 
@@ -363,7 +379,7 @@ input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent); }
   <div class="container">
     <header class="header">
       <h1 class="logo">ANIMA</h1>
-      <p class="subtitle">AI Reflective Companion</p>
+      <p class="subtitle">AI Reflective Practice</p>
       <div class="research-badge">
         <span class="badge-dot"></span>
         <span>RESEARCH PROTOTYPE</span>
@@ -1776,6 +1792,6 @@ const chartCanvas = document.getElementById('e2Chart');
     arrow.classList.toggle('open');
   }
   </script>
-  
+
 </body>
 </html>
