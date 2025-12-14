@@ -60,52 +60,47 @@ body {
   border: 1px solid var(--border); 
 }
 
-.practice-toggle-btn {
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
+.practice-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  cursor: pointer;
 }
 
-.practice-toggle-left {
+.practice-header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .practice-icon {
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
-.practice-toggle-text h3 {
+.practice-title {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--text-bold);
-  margin-bottom: 3px;
-}
-
-.practice-toggle-text p {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  font-weight: 400;
 }
 
 .practice-arrow {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   transition: transform 0.3s ease;
 }
 
 .practice-arrow.open {
   transform: rotate(180deg);
+}
+
+.practice-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
 }
 
 .practice-content {
@@ -120,9 +115,9 @@ body {
 
 .practice-intro {
   font-size: 0.82rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   margin-bottom: 16px;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .practice-intro strong {
@@ -134,23 +129,29 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .comparison-card {
+  padding: 14px 10px;
   background: rgba(255,255,255,0.6);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 14px 12px;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.comparison-card:hover {
+  background: rgba(255,255,255,0.9);
+  border-color: var(--border-hover);
 }
 
 .comparison-card h4 {
   font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-bold);
-  margin-bottom: 10px;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
 }
 
 .comparison-card ul {
@@ -160,24 +161,27 @@ body {
 }
 
 .comparison-card li {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  padding: 4px 0;
-  line-height: 1.5;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 4px;
 }
 
 .practice-skills {
-  background: var(--bg-input);
+  margin-top: 16px;
   padding: 14px;
+  background: var(--bg-input);
   border-radius: 10px;
-  margin-bottom: 14px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
 
 .practice-skills h4 {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.8rem;
   color: var(--text-bold);
-  margin-bottom: 12px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 .skills-grid {
@@ -193,20 +197,20 @@ body {
 }
 
 .skill-item strong {
-  color: var(--accent);
-  font-weight: 600;
+  color: var(--text-bold);
+  font-weight: 700;
 }
 
 .practice-footer {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
-  line-height: 1.6;
-  font-style: italic;
+  margin-top: 16px;
+  line-height: 1.5;
 }
 
 .practice-footer strong {
-  color: var(--text-secondary);
-  font-weight: 600;
+  color: var(--text-bold);
+  font-weight: 700;
 }
 
 .cycle-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
@@ -367,16 +371,15 @@ input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent); }
     </header>
 
     <section class="practice-info">
-      <button class="practice-toggle-btn" onclick="togglePractice()" aria-label="Toggle practice information">
-        <div class="practice-toggle-left">
+      <div class="practice-header" onclick="togglePractice()">
+        <div class="practice-header-left">
           <span class="practice-icon">💭</span>
-          <div class="practice-toggle-text">
-            <h3>Why Reflective Practice?</h3>
-            <p>How ANIMA strengthens your capacity for self-understanding</p>
-          </div>
+          <h2 class="practice-title">Why Reflective Practice?</h2>
         </div>
         <span class="practice-arrow" id="practiceArrow">▼</span>
-      </button>
+      </div>
+      
+      <p class="practice-desc">How ANIMA strengthens your capacity for self-understanding</p>
       
       <div class="practice-content" id="practiceContent">
         
@@ -386,7 +389,7 @@ input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent); }
     
         <div class="practice-comparison">
           <div class="comparison-card">
-            <h4>🤖 Traditional AI</h4>
+            <h4>🤖 TRADITIONAL AI</h4>
             <ul>
               <li>Tells you what's happening</li>
               <li>Provides solutions</li>
@@ -395,7 +398,7 @@ input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent); }
           </div>
           
           <div class="comparison-card">
-            <h4>🧠 Reflective Practice</h4>
+            <h4>🧠 REFLECTIVE PRACTICE</h4>
             <ul>
               <li>Asks questions that deepen awareness</li>
               <li>Offers frameworks</li>
@@ -405,7 +408,7 @@ input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent); }
         </div>
     
         <div class="practice-skills">
-          <h4>Reflection requires distinctly human capacities:</h4>
+          <strong>Reflection requires distinctly human capacities:</strong>
           <div class="skills-grid">
             <div class="skill-item"><strong>Awareness</strong> — noticing without judgment</div>
             <div class="skill-item"><strong>Willingness</strong> — opening to discovery</div>
@@ -1773,5 +1776,6 @@ const chartCanvas = document.getElementById('e2Chart');
     arrow.classList.toggle('open');
   }
   </script>
+  
 </body>
 </html>
