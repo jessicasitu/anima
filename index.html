@@ -52,6 +52,163 @@ body {
 .section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-bold); }
 .section-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
 
+.practice-info { 
+  margin-bottom: 28px; 
+  padding: 20px; 
+  background: var(--bg-card); 
+  border-radius: 14px; 
+  border: 1px solid var(--border); 
+}
+
+.practice-toggle-btn {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.practice-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.practice-icon {
+  font-size: 1.2rem;
+}
+
+.practice-toggle-text h3 {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-bold);
+  margin-bottom: 3px;
+}
+
+.practice-toggle-text p {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.practice-arrow {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  transition: transform 0.3s ease;
+}
+
+.practice-arrow.open {
+  transform: rotate(180deg);
+}
+
+.practice-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.practice-content.open {
+  max-height: 1000px;
+}
+
+.practice-intro {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.practice-intro strong {
+  font-weight: 700;
+  color: var(--text-bold);
+}
+
+.practice-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.comparison-card {
+  background: rgba(255,255,255,0.6);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 12px;
+}
+
+.comparison-card h4 {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-bold);
+  margin-bottom: 10px;
+}
+
+.comparison-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.comparison-card li {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding: 4px 0;
+  line-height: 1.5;
+}
+
+.practice-skills {
+  background: var(--bg-input);
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+
+.practice-skills h4 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-bold);
+  margin-bottom: 12px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.skill-item {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.skill-item strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.practice-footer {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.practice-footer strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
 .cycle-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
 .cycle-option {
   padding: 14px 10px; background: rgba(255,255,255,0.6); border: 1px solid var(--border);
@@ -208,6 +365,64 @@ input[type="range"]::-webkit-slider-thumb:hover { background: var(--accent); }
         <span>RESEARCH PROTOTYPE</span>
       </div>
     </header>
+
+    <section class="practice-info">
+      <button class="practice-toggle-btn" onclick="togglePractice()" aria-label="Toggle practice information">
+        <div class="practice-toggle-left">
+          <span class="practice-icon">💭</span>
+          <div class="practice-toggle-text">
+            <h3>Why Reflective Practice?</h3>
+            <p>How ANIMA strengthens your capacity for self-understanding</p>
+          </div>
+        </div>
+        <span class="practice-arrow" id="practiceArrow">▼</span>
+      </button>
+      
+      <div class="practice-content" id="practiceContent">
+        
+        <p class="practice-intro">
+          <strong>Reflection is a skill that deepens with practice.</strong> ANIMA isn't an AI that tells you how to feel or what to do—it's a practice that helps you develop your own capacity for self-understanding.
+        </p>
+    
+        <div class="practice-comparison">
+          <div class="comparison-card">
+            <h4>🤖 Traditional AI</h4>
+            <ul>
+              <li>Tells you what's happening</li>
+              <li>Provides solutions</li>
+              <li>Creates dependency</li>
+            </ul>
+          </div>
+          
+          <div class="comparison-card">
+            <h4>🧠 Reflective Practice</h4>
+            <ul>
+              <li>Asks questions that deepen awareness</li>
+              <li>Offers frameworks</li>
+              <li>Builds your capacity</li>
+            </ul>
+          </div>
+        </div>
+    
+        <div class="practice-skills">
+          <h4>Reflection requires distinctly human capacities:</h4>
+          <div class="skills-grid">
+            <div class="skill-item"><strong>Awareness</strong> — noticing without judgment</div>
+            <div class="skill-item"><strong>Willingness</strong> — opening to discovery</div>
+            <div class="skill-item"><strong>Curiosity</strong> — asking questions</div>
+            <div class="skill-item"><strong>Critical thinking</strong> — examining patterns</div>
+            <div class="skill-item"><strong>Empathy</strong> — approaching with kindness</div>
+            <div class="skill-item"><strong>Depth</strong> — moving beyond surface</div>
+          </div>
+        </div>
+    
+        <p class="practice-footer">
+          As AI technology grows faster, we need practices that <strong>strengthen human capabilities, not replace them.</strong> ANIMA serves as a guide to develop these skills—not a substitute for your own insight.
+        </p>
+    
+      </div>
+    </section>
+    
 
     <section class="section" id="cycle-context">
       <h2 class="section-title">Cycle Context</h2>
@@ -1547,6 +1762,16 @@ const chartCanvas = document.getElementById('e2Chart');
     
     E2Simulator.start();
     updateSessionPanel();
+  </script>
+
+<script>
+  function togglePractice() {
+    const content = document.getElementById('practiceContent');
+    const arrow = document.getElementById('practiceArrow');
+    
+    content.classList.toggle('open');
+    arrow.classList.toggle('open');
+  }
   </script>
 </body>
 </html>
